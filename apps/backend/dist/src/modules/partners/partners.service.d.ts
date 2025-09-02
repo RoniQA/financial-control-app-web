@@ -1,0 +1,87 @@
+import { PrismaService } from '../../database/prisma.service';
+import { CreatePartnerDto } from './dto/create-partner.dto';
+import { UpdatePartnerDto } from './dto/update-partner.dto';
+export declare class PartnersService {
+    private readonly prisma;
+    constructor(prisma: PrismaService);
+    create(createPartnerDto: CreatePartnerDto): Promise<{
+        id: string;
+        name: string;
+        ie: string | null;
+        email: string | null;
+        phone: string | null;
+        address: import("@prisma/client/runtime/library").JsonValue | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        isActive: boolean;
+        companyId: string;
+        type: string;
+        document: string;
+        im: string | null;
+    }>;
+    findAll(companyId: string, filters?: any): Promise<{
+        id: string;
+        name: string;
+        ie: string | null;
+        email: string | null;
+        phone: string | null;
+        address: import("@prisma/client/runtime/library").JsonValue | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        isActive: boolean;
+        companyId: string;
+        type: string;
+        document: string;
+        im: string | null;
+    }[]>;
+    findById(id: string): Promise<{
+        id: string;
+        name: string;
+        ie: string | null;
+        email: string | null;
+        phone: string | null;
+        address: import("@prisma/client/runtime/library").JsonValue | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        isActive: boolean;
+        companyId: string;
+        type: string;
+        document: string;
+        im: string | null;
+    }>;
+    update(id: string, updatePartnerDto: UpdatePartnerDto): Promise<{
+        id: string;
+        name: string;
+        ie: string | null;
+        email: string | null;
+        phone: string | null;
+        address: import("@prisma/client/runtime/library").JsonValue | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        isActive: boolean;
+        companyId: string;
+        type: string;
+        document: string;
+        im: string | null;
+    }>;
+    remove(id: string): Promise<{
+        id: string;
+        name: string;
+        ie: string | null;
+        email: string | null;
+        phone: string | null;
+        address: import("@prisma/client/runtime/library").JsonValue | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        isActive: boolean;
+        companyId: string;
+        type: string;
+        document: string;
+        im: string | null;
+    }>;
+}

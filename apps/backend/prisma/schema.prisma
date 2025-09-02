@@ -1,0 +1,572 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== CORE ENTITIES =====
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String
+  cnpj        String   @unique
+  ie          String?
+  email       String
+  phone       String?
+  address     Json?
+  fiscalConfig Json?   // Configurações fiscais da empresa
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  users       User[]
+  products    Product[]
+  warehouses  Warehouse[]
+  partners    Partner[]
+  orders      Order[]
+  invoices    Invoice[]
+  payments    Payment[]
+  bankAccounts BankAccount[]
+  costCenters CostCenter[]
+  chartAccounts ChartAccount[]
+  fiscalConfigs FiscalConfig[]
+  nfeDocuments NfeDocument[]
+  nfseDocuments NfseDocument[]
+  nfceDocuments NfceDocument[]
+
+  @@map("companies")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String
+  firstName   String
+  lastName    String
+  phone       String?
+  isActive    Boolean  @default(true)
+  lastLogin   DateTime?
+  failedLogins Int     @default(0)
+  lockedUntil DateTime?
+  mfaEnabled  Boolean  @default(false)
+  mfaSecret   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  roles       UserRole[]
+  auditLogs   AuditLog[]
+  orders      Order[]
+  invoices    Invoice[]
+  payments    Payment[]
+
+  @@map("users")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  permissions Json     // Array de permissões
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String   // CREATE, UPDATE, DELETE, LOGIN, etc.
+  entity    String   // Nome da entidade afetada
+  entityId  String?  // ID da entidade
+  oldData   Json?    // Dados anteriores
+  newData   Json?    // Dados novos
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+// ===== PRODUCTS & INVENTORY =====
+
+model Product {
+  id          String   @id @default(cuid())
+  sku         String
+  name        String
+  description String?
+  category    String?
+  brand       String?
+  model       String?
+  variations  Json?    // Variações (voltagem, bitola, etc.)
+  ncm         String?  // Nomenclatura Comum do Mercosul
+  cest        String?  // Código Especificador da Substituição Tributária
+  unit        String   @default("UN") // UN, KG, M, etc.
+  weight      Float?
+  dimensions  Json?    // {length, width, height}
+  isActive    Boolean  @default(true)
+  isService   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  prices      ProductPrice[]
+  stocks      Stock[]
+  stockMoves  StockMove[]
+  orderItems  OrderItem[]
+  invoiceItems InvoiceItem[]
+
+  @@unique([companyId, sku])
+  @@map("products")
+}
+
+model ProductPrice {
+  id        String   @id @default(cuid())
+  productId String
+  costPrice Float?   // Preço de custo
+  avgCost   Float?   // Custo médio
+  markup    Float?   // Margem de lucro (%)
+  salePrice Float    // Preço de venda
+  validFrom DateTime @default(now())
+  validTo   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_prices")
+}
+
+model Warehouse {
+  id          String   @id @default(cuid())
+  name        String
+  code        String
+  address     Json?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  stocks      Stock[]
+  stockMoves  StockMove[]
+
+  @@unique([companyId, code])
+  @@map("warehouses")
+}
+
+model Stock {
+  id          String   @id @default(cuid())
+  productId   String
+  warehouseId String
+  quantity    Float    @default(0)
+  reserved    Float    @default(0) // Quantidade reservada
+  minStock    Float?   // Estoque mínimo
+  maxStock    Float?   // Estoque máximo
+  location    String?  // Localização no estoque
+  batch       String?  // Lote
+  serial      String?  // Número de série
+  expiryDate  DateTime? // Data de validade
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, warehouseId, batch, serial])
+  @@map("stocks")
+}
+
+model StockMove {
+  id          String   @id @default(cuid())
+  type        String   // IN, OUT, TRANSFER, ADJUSTMENT
+  productId   String
+  warehouseId String
+  quantity    Float
+  unitCost    Float?
+  totalCost   Float?
+  reference   String?  // Referência do documento
+  referenceId String?  // ID do documento
+  batch       String?
+  serial      String?
+  reason      String?  // Motivo da movimentação
+  createdAt   DateTime @default(now())
+
+  // Relations
+  product     Product   @relation(fields: [productId], references: [id])
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id])
+
+  @@map("stock_moves")
+}
+
+// ===== PARTNERS =====
+
+model Partner {
+  id          String   @id @default(cuid())
+  type        String   // CUSTOMER, SUPPLIER, BOTH
+  name        String
+  document    String   // CPF ou CNPJ
+  ie          String?  // Inscrição Estadual
+  im          String?  // Inscrição Municipal
+  email       String?
+  phone       String?
+  address     Json?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  orders      Order[]
+  invoices    Invoice[]
+  payments    Payment[]
+
+  @@unique([companyId, document])
+  @@map("partners")
+}
+
+// ===== ORDERS =====
+
+model Order {
+  id          String   @id @default(cuid())
+  number      String
+  type        String   // PURCHASE, SALE, QUOTE, WORK_ORDER
+  status      String   // DRAFT, PENDING, APPROVED, IN_PROGRESS, COMPLETED, CANCELLED
+  partnerId   String?
+  userId      String
+  total       Float    @default(0)
+  discount    Float    @default(0)
+  tax         Float    @default(0)
+  notes       String?
+  validUntil  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  partner     Partner? @relation(fields: [partnerId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  items       OrderItem[]
+  invoices    Invoice[]
+
+  @@unique([companyId, number])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  productId   String
+  quantity    Float
+  unitPrice   Float
+  discount    Float    @default(0)
+  tax         Float    @default(0)
+  total       Float
+  notes       String?
+
+  // Relations
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// ===== INVOICES =====
+
+model Invoice {
+  id          String   @id @default(cuid())
+  number      String
+  type        String   // INBOUND, OUTBOUND
+  status      String   // DRAFT, SENT, PAID, CANCELLED
+  partnerId   String?
+  userId      String
+  orderId     String?
+  total       Float    @default(0)
+  tax         Float    @default(0)
+  dueDate     DateTime?
+  paidAt      DateTime?
+  notes       String?
+  xmlContent  String?  // Conteúdo do XML
+  xmlKey      String?  // Chave da NFe
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  partner     Partner? @relation(fields: [partnerId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
+  order       Order?   @relation(fields: [orderId], references: [id])
+  items       InvoiceItem[]
+  payments    Payment[]
+
+  @@unique([companyId, number])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  productId   String
+  quantity    Float
+  unitPrice   Float
+  discount    Float    @default(0)
+  tax         Float    @default(0)
+  total       Float
+  cfop        String?  // Código Fiscal de Operações e Prestações
+  ncm         String?
+  cest        String?
+  csosn       String?  // Código de Situação da Operação
+  icms        Float?   // Alíquota ICMS
+  pis         Float?   // Alíquota PIS
+  cofins      Float?   // Alíquota COFINS
+  ipi         Float?   // Alíquota IPI
+
+  // Relations
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("invoice_items")
+}
+
+// ===== FINANCIAL =====
+
+model Payment {
+  id          String   @id @default(cuid())
+  type        String   // INBOUND, OUTBOUND
+  method      String   // CASH, PIX, BOLETO, CARD, TRANSFER
+  amount      Float
+  description String?
+  reference   String?  // Referência do documento
+  referenceId String?  // ID do documento
+  dueDate     DateTime?
+  paidAt      DateTime?
+  fees        Float    @default(0) // Taxas
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  partnerId   String?
+  partner     Partner? @relation(fields: [partnerId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  invoiceId   String?
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id])
+  bankAccountId String?
+  bankAccount BankAccount? @relation(fields: [bankAccountId], references: [id])
+
+  @@map("payments")
+}
+
+model BankAccount {
+  id          String   @id @default(cuid())
+  name        String
+  bank        String
+  agency      String
+  account     String
+  type        String   // CHECKING, SAVINGS, INVESTMENT
+  balance     Float    @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  payments    Payment[]
+  statements  BankStatement[]
+
+  @@map("bank_accounts")
+}
+
+model BankStatement {
+  id            String   @id @default(cuid())
+  bankAccountId String
+  date          DateTime
+  description   String
+  amount        Float
+  balance       Float
+  reference     String?
+  createdAt     DateTime @default(now())
+
+  // Relations
+  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
+
+  @@map("bank_statements")
+}
+
+// ===== COST CENTERS & CHART OF ACCOUNTS =====
+
+model CostCenter {
+  id          String   @id @default(cuid())
+  code        String
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, code])
+  @@map("cost_centers")
+}
+
+model ChartAccount {
+  id          String   @id @default(cuid())
+  code        String
+  name        String
+  type        String   // ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE
+  parentId    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  parent      ChartAccount? @relation("ChartAccountParent", fields: [parentId], references: [id])
+  children    ChartAccount[] @relation("ChartAccountParent")
+
+  @@unique([companyId, code])
+  @@map("chart_accounts")
+}
+
+// ===== FISCAL CONFIGURATIONS =====
+
+model FiscalConfig {
+  id          String   @id @default(cuid())
+  type        String   // CSOSN, CFOP, NCM, ICMS_RULE
+  code        String
+  name        String
+  description String?
+  config      Json     // Configurações específicas
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, type, code])
+  @@map("fiscal_configs")
+}
+
+// ===== FISCAL DOCUMENTS =====
+
+model NfeDocument {
+  id          String   @id @default(cuid())
+  number      String
+  series      String
+  key         String   @unique
+  status      String   // DRAFT, SENT, AUTHORIZED, DENIED, CANCELLED
+  xmlContent  String?  // XML da NFe
+  danfeUrl    String?  // URL do DANFE
+  protocol    String?  // Protocolo de autorização
+  error       String?  // Erro se houver
+  sentAt      DateTime?
+  authorizedAt DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, number, series])
+  @@map("nfe_documents")
+}
+
+model NfseDocument {
+  id          String   @id @default(cuid())
+  number      String
+  status      String   // DRAFT, SENT, AUTHORIZED, DENIED, CANCELLED
+  xmlContent  String?  // XML da NFS-e
+  pdfUrl      String?  // URL do PDF
+  protocol    String?  // Protocolo de autorização
+  error       String?  // Erro se houver
+  sentAt      DateTime?
+  authorizedAt DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, number])
+  @@map("nfse_documents")
+}
+
+model NfceDocument {
+  id          String   @id @default(cuid())
+  number      String
+  series      String
+  key         String   @unique
+  status      String   // DRAFT, SENT, AUTHORIZED, DENIED, CANCELLED
+  xmlContent  String?  // XML da NFC-e
+  danfceUrl   String?  // URL do DANFCE
+  protocol    String?  // Protocolo de autorização
+  error       String?  // Erro se houver
+  sentAt      DateTime?
+  authorizedAt DateTime?
+  cancelledAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, number, series])
+  @@map("nfce_documents")
+}
+
