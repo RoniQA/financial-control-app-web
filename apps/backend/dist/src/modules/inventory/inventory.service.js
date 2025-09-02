@@ -17,7 +17,6 @@ let InventoryService = class InventoryService {
         this.prisma = prisma;
     }
     async createStockMove(createStockMoveDto) {
-        console.log('Creating stock move:', createStockMoveDto);
         const stockMove = await this.prisma.stockMove.create({
             data: createStockMoveDto,
             include: {
@@ -25,7 +24,6 @@ let InventoryService = class InventoryService {
                 warehouse: true,
             },
         });
-        console.log('Stock move created:', stockMove);
         const existingStock = await this.prisma.stock.findFirst({
             where: {
                 productId: createStockMoveDto.productId,
@@ -34,12 +32,10 @@ let InventoryService = class InventoryService {
                 serial: createStockMoveDto.serial || null,
             },
         });
-        console.log('Existing stock:', existingStock);
         if (existingStock) {
             const newQuantity = createStockMoveDto.type === 'IN'
                 ? existingStock.quantity + createStockMoveDto.quantity
                 : existingStock.quantity - createStockMoveDto.quantity;
-            console.log('Updating stock. Old:', existingStock.quantity, 'New:', newQuantity);
             await this.prisma.stock.update({
                 where: {
                     id: existingStock.id,
@@ -53,7 +49,6 @@ let InventoryService = class InventoryService {
             const quantity = createStockMoveDto.type === 'IN'
                 ? createStockMoveDto.quantity
                 : -createStockMoveDto.quantity;
-            console.log('Creating new stock record with quantity:', quantity);
             await this.prisma.stock.create({
                 data: {
                     productId: createStockMoveDto.productId,

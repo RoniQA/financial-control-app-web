@@ -103,6 +103,111 @@ let FinancialService = class FinancialService {
             },
         });
     }
+    async getFinancialNotifications(companyId) {
+        console.log('🔍 Fetching financial notifications for company:', companyId);
+        const notifications = await this.prisma.financialNotification.findMany({
+            where: {
+                companyId,
+                status: 'PENDING',
+            },
+            include: {
+                order: {
+                    include: {
+                        partner: true,
+                        user: true,
+                    },
+                },
+                partner: true,
+                user: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+        console.log('📊 Found', notifications.length, 'pending notifications');
+        return notifications;
+    }
+    async approveFinancialNotification(notificationId, companyId) {
+        const notification = await this.prisma.financialNotification.findFirst({
+            where: {
+                id: notificationId,
+                companyId,
+                status: 'PENDING',
+            },
+            include: {
+                order: true,
+            },
+        });
+        if (!notification) {
+            throw new common_1.NotFoundException('Notificação financeira não encontrada');
+        }
+        const payment = await this.prisma.payment.create({
+            data: {
+                type: notification.type,
+                method: 'CASH',
+                amount: notification.amount,
+                description: notification.description,
+                reference: notification.order.number,
+                referenceId: notification.orderId,
+                companyId: notification.companyId,
+                partnerId: notification.partnerId,
+                userId: notification.userId,
+                paidAt: new Date(),
+            },
+        });
+        await this.prisma.financialNotification.update({
+            where: { id: notificationId },
+            data: { status: 'APPROVED' },
+        });
+        return payment;
+    }
+    async rejectFinancialNotification(notificationId, companyId) {
+        const notification = await this.prisma.financialNotification.findFirst({
+            where: {
+                id: notificationId,
+                companyId,
+                status: 'PENDING',
+            },
+        });
+        if (!notification) {
+            throw new common_1.NotFoundException('Notificação financeira não encontrada');
+        }
+        return this.prisma.financialNotification.update({
+            where: { id: notificationId },
+            data: { status: 'REJECTED' },
+        });
+    }
+    async getCompanyBalance(companyId) {
+        const [inboundResult, outboundResult] = await Promise.all([
+            this.prisma.payment.aggregate({
+                where: {
+                    companyId,
+                    type: 'INBOUND',
+                    paidAt: { not: null },
+                },
+                _sum: {
+                    amount: true,
+                },
+            }),
+            this.prisma.payment.aggregate({
+                where: {
+                    companyId,
+                    type: 'OUTBOUND',
+                    paidAt: { not: null },
+                },
+                _sum: {
+                    amount: true,
+                },
+            }),
+        ]);
+        const totalInbound = inboundResult._sum.amount || 0;
+        const totalOutbound = outboundResult._sum.amount || 0;
+        return {
+            totalInbound,
+            totalOutbound,
+            balance: totalInbound - totalOutbound,
+        };
+    }
 };
 exports.FinancialService = FinancialService;
 exports.FinancialService = FinancialService = __decorate([

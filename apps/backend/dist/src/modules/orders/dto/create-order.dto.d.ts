@@ -18,5 +18,6 @@ export declare class CreateOrderDto {
     tax?: number;
     notes?: string;
     validUntil?: string;
+    orderDate?: string;
     items: CreateOrderItemDto[];
 }

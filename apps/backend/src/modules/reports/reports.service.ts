@@ -9,7 +9,7 @@ export class ReportsService {
     const where: any = {
       companyId,
       type: 'SALE',
-      status: 'COMPLETED',
+      // Removed status filter to include all sales orders
     };
 
     if (startDate && endDate) {
@@ -19,18 +19,24 @@ export class ReportsService {
       };
     }
 
-    return this.prisma.order.findMany({
+    const result = await this.prisma.order.findMany({
       where,
-      include: {
-        partner: true,
-        items: {
-          include: {
-            product: true,
+      select: {
+        id: true,
+        number: true,
+        type: true,
+        total: true,
+        createdAt: true,
+        partner: {
+          select: {
+            name: true,
           },
         },
       },
       orderBy: { createdAt: 'desc' },
     });
+
+    return result;
   }
 
   async getInventoryReport(companyId: string) {
@@ -50,6 +56,42 @@ export class ReportsService {
         },
       },
     });
+  }
+
+  async getPurchaseReport(companyId: string, startDate?: Date, endDate?: Date) {
+    const where: any = {
+      companyId,
+      type: 'PURCHASE',
+      // Removed status filter to include all purchase orders
+    };
+
+    if (startDate && endDate) {
+      where.createdAt = {
+        gte: startDate,
+        lte: endDate,
+      };
+    }
+
+    const result = await this.prisma.order.findMany({
+      where,
+      select: {
+        id: true,
+        number: true,
+        type: true,
+        total: true,
+        createdAt: true,
+        partner: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return result;
   }
 
   async getFinancialReport(companyId: string, startDate?: Date, endDate?: Date) {

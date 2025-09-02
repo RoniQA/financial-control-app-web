@@ -19,10 +19,24 @@ export class ReportsController {
     @Query('endDate') endDate?: string,
   ) {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     const start = startDate ? new Date(startDate) : undefined;
     const end = endDate ? new Date(endDate) : undefined;
     return this.reportsService.getSalesReport(companyId, start, end);
+  }
+
+  @Get('purchases')
+  @ApiOperation({ summary: 'Relatório de compras' })
+  @ApiResponse({ status: 200, description: 'Relatório de compras' })
+  async getPurchaseReport(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
+    // TODO: Get companyId from JWT token
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    const start = startDate ? new Date(startDate) : undefined;
+    const end = endDate ? new Date(endDate) : undefined;
+    return this.reportsService.getPurchaseReport(companyId, start, end);
   }
 
   @Get('inventory')
@@ -30,7 +44,7 @@ export class ReportsController {
   @ApiResponse({ status: 200, description: 'Relatório de estoque' })
   async getInventoryReport() {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     return this.reportsService.getInventoryReport(companyId);
   }
 
@@ -42,7 +56,7 @@ export class ReportsController {
     @Query('endDate') endDate?: string,
   ) {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     const start = startDate ? new Date(startDate) : undefined;
     const end = endDate ? new Date(endDate) : undefined;
     return this.reportsService.getFinancialReport(companyId, start, end);
@@ -53,7 +67,7 @@ export class ReportsController {
   @ApiResponse({ status: 200, description: 'Dados do dashboard' })
   async getDashboardData() {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     return this.reportsService.getDashboardData(companyId);
   }
 }

@@ -18,7 +18,7 @@ export class OrdersController {
   @ApiResponse({ status: 201, description: 'Pedido criado com sucesso' })
   async create(@Body() createOrderDto: CreateOrderDto) {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     return this.ordersService.create(createOrderDto, companyId);
   }
 
@@ -27,7 +27,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Lista de pedidos' })
   async findAll(@Query() filters: any) {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     return this.ordersService.findAll(companyId, filters);
   }
 
@@ -43,7 +43,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Pedido atualizado com sucesso' })
   async update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     return this.ordersService.update(id, updateOrderDto, companyId);
   }
 

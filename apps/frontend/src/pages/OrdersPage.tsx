@@ -1,11 +1,19 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Plus, Search, Edit, Eye } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Plus, Search, Edit, Eye, Trash2 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 import api from '../services/api'
+import { OrderFormModal } from '../components/OrderFormModal'
+import { OrderViewModal } from '../components/OrderViewModal'
 
 export function OrdersPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingOrder, setEditingOrder] = useState(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [viewingOrder, setViewingOrder] = useState(null)
+  const queryClient = useQueryClient()
 
   const { data: orders, isLoading } = useQuery({
     queryKey: ['orders', search, statusFilter],
@@ -16,6 +24,64 @@ export function OrdersPage() {
       return response.data
     },
   })
+
+  const handleCreateOrder = () => {
+    setEditingOrder(null)
+    setIsModalOpen(true)
+  }
+
+  const handleEditOrder = (order: any) => {
+    setEditingOrder(order)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setEditingOrder(null)
+  }
+
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['orders'] })
+  }
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      console.log('=== CHANGING ORDER STATUS ===')
+      console.log('Order ID:', orderId)
+      console.log('New Status:', newStatus)
+      
+      await api.patch(`/orders/${orderId}`, { 
+        status: newStatus
+      })
+      toast.success('Status atualizado com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['orders'] })
+    } catch (error: any) {
+      console.error('Error changing status:', error)
+      toast.error(error.response?.data?.message || 'Erro ao atualizar status')
+    }
+  }
+
+  const handleViewOrder = (order: any) => {
+    setViewingOrder(order)
+    setIsViewModalOpen(true)
+  }
+
+  const handleViewModalClose = () => {
+    setIsViewModalOpen(false)
+    setViewingOrder(null)
+  }
+
+  const handleDeleteOrder = async (order: any) => {
+    if (window.confirm(`Tem certeza que deseja deletar o pedido ${order.number}?`)) {
+      try {
+        await api.delete(`/orders/${order.id}`)
+        toast.success('Pedido deletado com sucesso!')
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || 'Erro ao deletar pedido')
+      }
+    }
+  }
 
   if (isLoading) {
     return (
@@ -32,7 +98,10 @@ export function OrdersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Pedidos</h1>
           <p className="text-gray-600">Gerencie pedidos de compra e venda</p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+        <button 
+          onClick={handleCreateOrder}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Novo Pedido
         </button>
@@ -118,31 +187,62 @@ export function OrdersPage() {
                     {order.partner?.name || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      order.status === 'COMPLETED' 
-                        ? 'bg-green-100 text-green-800'
-                        : order.status === 'PENDING'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : order.status === 'CANCELLED'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {order.status}
-                    </span>
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                      className={`text-xs font-semibold rounded-full border-0 focus:ring-2 focus:ring-blue-500 ${
+                        order.status === 'COMPLETED' 
+                          ? 'bg-green-100 text-green-800'
+                          : order.status === 'PENDING'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : order.status === 'CANCELLED'
+                          ? 'bg-red-100 text-red-800'
+                          : order.status === 'APPROVED'
+                          ? 'bg-blue-100 text-blue-800'
+                                                     : order.status === 'IN_SEPARATION'
+                           ? 'bg-purple-100 text-purple-800'
+                           : order.status === 'IN_DELIVERY'
+                           ? 'bg-indigo-100 text-indigo-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      <option value="DRAFT">Rascunho</option>
+                      <option value="PENDING">Pendente</option>
+                      <option value="APPROVED">Aprovado</option>
+                      <option value="IN_SEPARATION">Em Separação</option>
+             <option value="IN_DELIVERY">Em Rota de Entrega</option>
+                      <option value="COMPLETED">Concluído</option>
+                      <option value="CANCELLED">Cancelado</option>
+                    </select>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     R$ {order.total?.toFixed(2) || '0.00'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(order.createdAt).toLocaleDateString('pt-BR')}
+                    {new Date(order.orderDate || order.createdAt).toLocaleDateString('pt-BR')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900">
+                      <button 
+                        onClick={() => handleViewOrder(order)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="Visualizar pedido"
+                      >
                         <Eye className="h-4 w-4" />
                       </button>
-                      <button className="text-green-600 hover:text-green-900">
+                      <button 
+                        onClick={() => handleEditOrder(order)}
+                        className="text-green-600 hover:text-green-900"
+                        title="Editar pedido"
+                      >
                         <Edit className="h-4 w-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteOrder(order)}
+                        className="text-red-600 hover:text-red-900"
+                        title="Deletar pedido"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </td>
@@ -158,6 +258,20 @@ export function OrdersPage() {
           <p className="text-gray-500">Nenhum pedido encontrado</p>
         </div>
       )}
+
+      {/* Modals */}
+      <OrderFormModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleSuccess}
+        order={editingOrder}
+      />
+      
+      <OrderViewModal
+        isOpen={isViewModalOpen}
+        onClose={handleViewModalClose}
+        order={viewingOrder}
+      />
     </div>
   )
 }

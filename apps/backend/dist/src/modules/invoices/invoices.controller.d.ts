@@ -55,6 +55,7 @@ export declare class InvoicesController {
             status: string;
             partnerId: string | null;
             validUntil: Date | null;
+            orderDate: Date;
         };
         items: ({
             product: {
@@ -88,13 +89,13 @@ export declare class InvoicesController {
             discount: number;
             tax: number;
             total: number;
+            invoiceId: string;
             cfop: string | null;
             csosn: string | null;
             icms: number | null;
             pis: number | null;
             cofins: number | null;
             ipi: number | null;
-            invoiceId: string;
         })[];
     } & {
         number: string;
@@ -110,9 +111,9 @@ export declare class InvoicesController {
         notes: string | null;
         status: string;
         partnerId: string | null;
-        orderId: string | null;
         dueDate: Date | null;
         paidAt: Date | null;
+        orderId: string | null;
         xmlContent: string | null;
         xmlKey: string | null;
     }>;
@@ -167,6 +168,7 @@ export declare class InvoicesController {
             status: string;
             partnerId: string | null;
             validUntil: Date | null;
+            orderDate: Date;
         };
         items: ({
             product: {
@@ -200,13 +202,13 @@ export declare class InvoicesController {
             discount: number;
             tax: number;
             total: number;
+            invoiceId: string;
             cfop: string | null;
             csosn: string | null;
             icms: number | null;
             pis: number | null;
             cofins: number | null;
             ipi: number | null;
-            invoiceId: string;
         })[];
     } & {
         number: string;
@@ -222,9 +224,9 @@ export declare class InvoicesController {
         notes: string | null;
         status: string;
         partnerId: string | null;
-        orderId: string | null;
         dueDate: Date | null;
         paidAt: Date | null;
+        orderId: string | null;
         xmlContent: string | null;
         xmlKey: string | null;
     })[]>;
@@ -279,6 +281,7 @@ export declare class InvoicesController {
             status: string;
             partnerId: string | null;
             validUntil: Date | null;
+            orderDate: Date;
         };
         items: ({
             product: {
@@ -312,13 +315,13 @@ export declare class InvoicesController {
             discount: number;
             tax: number;
             total: number;
+            invoiceId: string;
             cfop: string | null;
             csosn: string | null;
             icms: number | null;
             pis: number | null;
             cofins: number | null;
             ipi: number | null;
-            invoiceId: string;
         })[];
     } & {
         number: string;
@@ -334,9 +337,9 @@ export declare class InvoicesController {
         notes: string | null;
         status: string;
         partnerId: string | null;
-        orderId: string | null;
         dueDate: Date | null;
         paidAt: Date | null;
+        orderId: string | null;
         xmlContent: string | null;
         xmlKey: string | null;
     }>;
@@ -391,6 +394,7 @@ export declare class InvoicesController {
             status: string;
             partnerId: string | null;
             validUntil: Date | null;
+            orderDate: Date;
         };
         items: ({
             product: {
@@ -424,13 +428,13 @@ export declare class InvoicesController {
             discount: number;
             tax: number;
             total: number;
+            invoiceId: string;
             cfop: string | null;
             csosn: string | null;
             icms: number | null;
             pis: number | null;
             cofins: number | null;
             ipi: number | null;
-            invoiceId: string;
         })[];
     } & {
         number: string;
@@ -446,9 +450,9 @@ export declare class InvoicesController {
         notes: string | null;
         status: string;
         partnerId: string | null;
-        orderId: string | null;
         dueDate: Date | null;
         paidAt: Date | null;
+        orderId: string | null;
         xmlContent: string | null;
         xmlKey: string | null;
     }>;
@@ -466,9 +470,9 @@ export declare class InvoicesController {
         notes: string | null;
         status: string;
         partnerId: string | null;
-        orderId: string | null;
         dueDate: Date | null;
         paidAt: Date | null;
+        orderId: string | null;
         xmlContent: string | null;
         xmlKey: string | null;
     }>;

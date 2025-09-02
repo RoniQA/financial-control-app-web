@@ -58,10 +58,42 @@ export class FinancialController {
     @Query('endDate') endDate?: string,
   ) {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     const start = startDate ? new Date(startDate) : undefined;
     const end = endDate ? new Date(endDate) : undefined;
     return this.financialService.getCashFlow(companyId, start, end);
+  }
+
+  @Get('notifications')
+  @ApiOperation({ summary: 'Obter notificações financeiras pendentes' })
+  @ApiResponse({ status: 200, description: 'Lista de notificações financeiras' })
+  async getFinancialNotifications() {
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    return this.financialService.getFinancialNotifications(companyId);
+  }
+
+  @Post('notifications/:id/approve')
+  @ApiOperation({ summary: 'Aprovar notificação financeira' })
+  @ApiResponse({ status: 200, description: 'Notificação aprovada e pagamento criado' })
+  async approveFinancialNotification(@Param('id') id: string) {
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    return this.financialService.approveFinancialNotification(id, companyId);
+  }
+
+  @Post('notifications/:id/reject')
+  @ApiOperation({ summary: 'Rejeitar notificação financeira' })
+  @ApiResponse({ status: 200, description: 'Notificação rejeitada' })
+  async rejectFinancialNotification(@Param('id') id: string) {
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    return this.financialService.rejectFinancialNotification(id, companyId);
+  }
+
+  @Get('balance')
+  @ApiOperation({ summary: 'Obter saldo da empresa' })
+  @ApiResponse({ status: 200, description: 'Saldo da empresa' })
+  async getCompanyBalance() {
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    return this.financialService.getCompanyBalance(companyId);
   }
 }
 

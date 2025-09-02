@@ -22,23 +22,29 @@ let ReportsController = class ReportsController {
         this.reportsService = reportsService;
     }
     async getSalesReport(startDate, endDate) {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         const start = startDate ? new Date(startDate) : undefined;
         const end = endDate ? new Date(endDate) : undefined;
         return this.reportsService.getSalesReport(companyId, start, end);
     }
+    async getPurchaseReport(startDate, endDate) {
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+        const start = startDate ? new Date(startDate) : undefined;
+        const end = endDate ? new Date(endDate) : undefined;
+        return this.reportsService.getPurchaseReport(companyId, start, end);
+    }
     async getInventoryReport() {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         return this.reportsService.getInventoryReport(companyId);
     }
     async getFinancialReport(startDate, endDate) {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         const start = startDate ? new Date(startDate) : undefined;
         const end = endDate ? new Date(endDate) : undefined;
         return this.reportsService.getFinancialReport(companyId, start, end);
     }
     async getDashboardData() {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         return this.reportsService.getDashboardData(companyId);
     }
 };
@@ -53,6 +59,16 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], ReportsController.prototype, "getSalesReport", null);
+__decorate([
+    (0, common_1.Get)('purchases'),
+    (0, swagger_1.ApiOperation)({ summary: 'Relatório de compras' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Relatório de compras' }),
+    __param(0, (0, common_1.Query)('startDate')),
+    __param(1, (0, common_1.Query)('endDate')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], ReportsController.prototype, "getPurchaseReport", null);
 __decorate([
     (0, common_1.Get)('inventory'),
     (0, swagger_1.ApiOperation)({ summary: 'Relatório de estoque' }),

@@ -20,7 +20,6 @@ let ReportsService = class ReportsService {
         const where = {
             companyId,
             type: 'SALE',
-            status: 'COMPLETED',
         };
         if (startDate && endDate) {
             where.createdAt = {
@@ -28,18 +27,23 @@ let ReportsService = class ReportsService {
                 lte: endDate,
             };
         }
-        return this.prisma.order.findMany({
+        const result = await this.prisma.order.findMany({
             where,
-            include: {
-                partner: true,
-                items: {
-                    include: {
-                        product: true,
+            select: {
+                id: true,
+                number: true,
+                type: true,
+                total: true,
+                createdAt: true,
+                partner: {
+                    select: {
+                        name: true,
                     },
                 },
             },
             orderBy: { createdAt: 'desc' },
         });
+        return result;
     }
     async getInventoryReport(companyId) {
         return this.prisma.stock.findMany({
@@ -58,6 +62,37 @@ let ReportsService = class ReportsService {
                 },
             },
         });
+    }
+    async getPurchaseReport(companyId, startDate, endDate) {
+        const where = {
+            companyId,
+            type: 'PURCHASE',
+        };
+        if (startDate && endDate) {
+            where.createdAt = {
+                gte: startDate,
+                lte: endDate,
+            };
+        }
+        const result = await this.prisma.order.findMany({
+            where,
+            select: {
+                id: true,
+                number: true,
+                type: true,
+                total: true,
+                createdAt: true,
+                partner: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+        return result;
     }
     async getFinancialReport(companyId, startDate, endDate) {
         const where = {

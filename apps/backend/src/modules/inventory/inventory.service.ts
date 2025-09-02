@@ -7,7 +7,6 @@ export class InventoryService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createStockMove(createStockMoveDto: CreateStockMoveDto) {
-    console.log('Creating stock move:', createStockMoveDto);
     
     // Create stock move
     const stockMove = await this.prisma.stockMove.create({
@@ -18,7 +17,7 @@ export class InventoryService {
       },
     });
 
-    console.log('Stock move created:', stockMove);
+
 
     // Update or create stock record
     const existingStock = await this.prisma.stock.findFirst({
@@ -30,7 +29,7 @@ export class InventoryService {
       },
     });
 
-    console.log('Existing stock:', existingStock);
+
 
     if (existingStock) {
       // Update existing stock
@@ -38,7 +37,7 @@ export class InventoryService {
         ? existingStock.quantity + createStockMoveDto.quantity
         : existingStock.quantity - createStockMoveDto.quantity;
 
-      console.log('Updating stock. Old:', existingStock.quantity, 'New:', newQuantity);
+
 
       await this.prisma.stock.update({
         where: {
@@ -54,7 +53,7 @@ export class InventoryService {
         ? createStockMoveDto.quantity
         : -createStockMoveDto.quantity;
 
-      console.log('Creating new stock record with quantity:', quantity);
+
 
       await this.prisma.stock.create({
         data: {

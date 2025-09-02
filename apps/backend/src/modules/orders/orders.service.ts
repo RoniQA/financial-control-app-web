@@ -1,13 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { InventoryService } from '../inventory/inventory.service';
+import { FinancialService } from '../financial/financial.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => InventoryService))
+    private readonly inventoryService: InventoryService,
+    @Inject(forwardRef(() => FinancialService))
+    private readonly financialService: FinancialService,
+  ) {}
 
   async create(createOrderDto: CreateOrderDto, companyId: string) {
+    
     return this.prisma.order.create({
       data: {
         number: createOrderDto.number,
@@ -17,10 +26,22 @@ export class OrdersService {
         discount: createOrderDto.discount || 0,
         tax: createOrderDto.tax || 0,
         notes: createOrderDto.notes,
+        orderDate: createOrderDto.orderDate ? new Date(createOrderDto.orderDate) : new Date(),
         validUntil: createOrderDto.validUntil ? new Date(createOrderDto.validUntil) : null,
         companyId: companyId,
         userId: createOrderDto.userId,
         partnerId: createOrderDto.partnerId,
+        items: {
+          create: createOrderDto.items?.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            discount: item.discount || 0,
+            tax: item.tax || 0,
+            total: item.total,
+            notes: item.notes,
+          })) || [],
+        },
       },
       include: {
         partner: true,
@@ -85,8 +106,19 @@ export class OrdersService {
   }
 
   async update(id: string, updateOrderDto: UpdateOrderDto, companyId: string) {
-    await this.findById(id);
-    return this.prisma.order.update({
+    
+    const existingOrder = await this.findById(id);
+    
+    // If items are being updated, handle them separately
+    if (updateOrderDto.items) {
+      console.log('Deleting existing items and creating new ones')
+      // Delete existing items
+      await this.prisma.orderItem.deleteMany({
+        where: { orderId: id }
+      });
+    }
+    
+    const updatedOrder = await this.prisma.order.update({
       where: { id, companyId },
       data: {
         ...(updateOrderDto.number && { number: updateOrderDto.number }),
@@ -96,8 +128,22 @@ export class OrdersService {
         ...(updateOrderDto.discount !== undefined && { discount: updateOrderDto.discount }),
         ...(updateOrderDto.tax !== undefined && { tax: updateOrderDto.tax }),
         ...(updateOrderDto.notes && { notes: updateOrderDto.notes }),
+        ...(updateOrderDto.orderDate && { orderDate: new Date(updateOrderDto.orderDate) }),
         ...(updateOrderDto.validUntil && { validUntil: new Date(updateOrderDto.validUntil) }),
         ...(updateOrderDto.partnerId && { partnerId: updateOrderDto.partnerId }),
+        ...(updateOrderDto.items && {
+          items: {
+            create: updateOrderDto.items.map(item => ({
+              productId: item.productId,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              discount: item.discount || 0,
+              tax: item.tax || 0,
+              total: item.total,
+              notes: item.notes,
+            }))
+          }
+        }),
       },
       include: {
         partner: true,
@@ -109,6 +155,14 @@ export class OrdersService {
         },
       },
     });
+
+    // Handle stock updates based on status changes
+    if (updateOrderDto.status && updateOrderDto.status !== existingOrder.status) {
+      console.log('🔄 Status changed from', existingOrder.status, 'to', updateOrderDto.status);
+      await this.handleStockUpdate(existingOrder, updatedOrder);
+    }
+
+    return updatedOrder;
   }
 
   async remove(id: string) {
@@ -118,5 +172,113 @@ export class OrdersService {
       data: { deletedAt: new Date() },
     });
   }
+
+      private async handleStockUpdate(existingOrder: any, updatedOrder: any) {
+        const { type, status: newStatus, items } = updatedOrder;
+        const { status: oldStatus } = existingOrder;
+
+    // Sales order: Update stock when moving to "IN_DELIVERY" or "COMPLETED"
+    if (type === 'SALE' && (newStatus === 'IN_DELIVERY' || newStatus === 'COMPLETED')) {
+      if (items && items.length > 0) {
+        for (const item of items) {
+          if (item.productId && item.quantity > 0) {
+            try {
+              await this.inventoryService.createStockMove({
+                productId: item.productId,
+                warehouseId: 'cmf1uv2n8000az0axienbav97', // Estoque Principal
+                type: 'OUT',
+                quantity: item.quantity,
+                reason: `Venda - Pedido ${updatedOrder.number}`,
+                reference: 'ORDER',
+                referenceId: updatedOrder.id,
+              });
+            } catch (error) {
+              console.error(`Error updating stock for product ${item.productId}:`, error);
+            }
+          }
+        }
+      }
+    }
+
+    // Purchase order: Update stock when status becomes "COMPLETED"
+    if (type === 'PURCHASE' && newStatus === 'COMPLETED') {
+      if (items && items.length > 0) {
+        for (const item of items) {
+          if (item.productId && item.quantity > 0) {
+            try {
+              await this.inventoryService.createStockMove({
+                productId: item.productId,
+                warehouseId: 'cmf1uv2n8000az0axienbav97', // Estoque Principal
+                type: 'IN',
+                quantity: item.quantity,
+                reason: `Compra - Pedido ${updatedOrder.number}`,
+                reference: 'ORDER',
+                referenceId: updatedOrder.id,
+              });
+            } catch (error) {
+              console.error(`Error updating stock for product ${item.productId}:`, error);
+            }
+          }
+        }
+      }
+    }
+      // Check if we should create financial notification
+      if (newStatus === 'COMPLETED') {
+        console.log('💰 Order completed, creating financial notification for:', updatedOrder.number);
+        await this.createFinancialNotification(updatedOrder);
+      }
+    }
+
+    private async createFinancialNotification(order: any) {
+      try {
+        console.log('🔍 Creating financial notification for order:', order.number, 'Type:', order.type, 'Total:', order.total);
+        
+        // Check if payment already exists for this order
+        const existingPayment = await this.prisma.payment.findFirst({
+          where: {
+            referenceId: order.id,
+            companyId: order.companyId,
+          },
+        });
+
+        if (existingPayment) {
+          console.log('⚠️ Payment already exists for order:', order.number);
+          return;
+        }
+
+        // Check if notification already exists
+        const existingNotification = await this.prisma.financialNotification.findFirst({
+          where: {
+            orderId: order.id,
+            companyId: order.companyId,
+          },
+        });
+
+        if (existingNotification) {
+          console.log('⚠️ Notification already exists for order:', order.number);
+          return;
+        }
+
+        // Create financial notification record
+        const notification = await this.prisma.financialNotification.create({
+          data: {
+            companyId: order.companyId,
+            orderId: order.id,
+            type: order.type === 'SALE' ? 'INBOUND' : 'OUTBOUND',
+            amount: order.total,
+            description: order.type === 'SALE' 
+              ? `Venda - Pedido ${order.number}` 
+              : `Compra - Pedido ${order.number}`,
+            status: 'PENDING',
+            partnerId: order.partnerId,
+            userId: order.userId,
+          },
+        });
+
+        console.log('✅ Financial notification created:', notification.id);
+      } catch (error) {
+        console.error('❌ Error creating financial notification:', error);
+      }
+    }
 }
 

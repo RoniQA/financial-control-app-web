@@ -40,10 +40,26 @@ let FinancialController = class FinancialController {
         return this.financialService.removePayment(id);
     }
     async getCashFlow(startDate, endDate) {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         const start = startDate ? new Date(startDate) : undefined;
         const end = endDate ? new Date(endDate) : undefined;
         return this.financialService.getCashFlow(companyId, start, end);
+    }
+    async getFinancialNotifications() {
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+        return this.financialService.getFinancialNotifications(companyId);
+    }
+    async approveFinancialNotification(id) {
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+        return this.financialService.approveFinancialNotification(id, companyId);
+    }
+    async rejectFinancialNotification(id) {
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+        return this.financialService.rejectFinancialNotification(id, companyId);
+    }
+    async getCompanyBalance() {
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+        return this.financialService.getCompanyBalance(companyId);
     }
 };
 exports.FinancialController = FinancialController;
@@ -103,6 +119,40 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], FinancialController.prototype, "getCashFlow", null);
+__decorate([
+    (0, common_1.Get)('notifications'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obter notificações financeiras pendentes' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de notificações financeiras' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], FinancialController.prototype, "getFinancialNotifications", null);
+__decorate([
+    (0, common_1.Post)('notifications/:id/approve'),
+    (0, swagger_1.ApiOperation)({ summary: 'Aprovar notificação financeira' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Notificação aprovada e pagamento criado' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], FinancialController.prototype, "approveFinancialNotification", null);
+__decorate([
+    (0, common_1.Post)('notifications/:id/reject'),
+    (0, swagger_1.ApiOperation)({ summary: 'Rejeitar notificação financeira' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Notificação rejeitada' }),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], FinancialController.prototype, "rejectFinancialNotification", null);
+__decorate([
+    (0, common_1.Get)('balance'),
+    (0, swagger_1.ApiOperation)({ summary: 'Obter saldo da empresa' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Saldo da empresa' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], FinancialController.prototype, "getCompanyBalance", null);
 exports.FinancialController = FinancialController = __decorate([
     (0, swagger_1.ApiTags)('Financial'),
     (0, common_1.Controller)('financial'),

@@ -24,18 +24,18 @@ let OrdersController = class OrdersController {
         this.ordersService = ordersService;
     }
     async create(createOrderDto) {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         return this.ordersService.create(createOrderDto, companyId);
     }
     async findAll(filters) {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         return this.ordersService.findAll(companyId, filters);
     }
     async findOne(id) {
         return this.ordersService.findById(id);
     }
     async update(id, updateOrderDto) {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         return this.ordersService.update(id, updateOrderDto, companyId);
     }
     async remove(id) {

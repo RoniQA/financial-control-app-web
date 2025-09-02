@@ -114,6 +114,12 @@ __decorate([
     __metadata("design:type", String)
 ], CreateOrderDto.prototype, "validUntil", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ example: '2024-01-15', required: false }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsDateString)(),
+    __metadata("design:type", String)
+], CreateOrderDto.prototype, "orderDate", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ type: [CreateOrderItemDto] }),
     (0, class_validator_1.IsArray)(),
     (0, class_validator_1.ValidateNested)({ each: true }),

@@ -10,11 +10,17 @@ exports.OrdersModule = void 0;
 const common_1 = require("@nestjs/common");
 const orders_service_1 = require("./orders.service");
 const orders_controller_1 = require("./orders.controller");
+const inventory_module_1 = require("../inventory/inventory.module");
+const financial_module_1 = require("../financial/financial.module");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
 exports.OrdersModule = OrdersModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            (0, common_1.forwardRef)(() => inventory_module_1.InventoryModule),
+            (0, common_1.forwardRef)(() => financial_module_1.FinancialModule),
+        ],
         providers: [orders_service_1.OrdersService],
         controllers: [orders_controller_1.OrdersController],
         exports: [orders_service_1.OrdersService],

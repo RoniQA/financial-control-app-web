@@ -2,73 +2,26 @@ import { ReportsService } from './reports.service';
 export declare class ReportsController {
     private readonly reportsService;
     constructor(reportsService: ReportsService);
-    getSalesReport(startDate?: string, endDate?: string): Promise<({
-        partner: {
-            id: string;
-            name: string;
-            ie: string | null;
-            email: string | null;
-            phone: string | null;
-            address: import("@prisma/client/runtime/library").JsonValue | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-            isActive: boolean;
-            companyId: string;
-            type: string;
-            document: string;
-            im: string | null;
-        };
-        items: ({
-            product: {
-                id: string;
-                name: string;
-                createdAt: Date;
-                updatedAt: Date;
-                deletedAt: Date | null;
-                description: string | null;
-                isActive: boolean;
-                companyId: string;
-                sku: string;
-                category: string | null;
-                brand: string | null;
-                model: string | null;
-                variations: import("@prisma/client/runtime/library").JsonValue | null;
-                ncm: string | null;
-                cest: string | null;
-                unit: string;
-                weight: number | null;
-                dimensions: import("@prisma/client/runtime/library").JsonValue | null;
-                isService: boolean;
-            };
-        } & {
-            id: string;
-            productId: string;
-            quantity: number;
-            unitPrice: number;
-            discount: number;
-            tax: number;
-            total: number;
-            notes: string | null;
-            orderId: string;
-        })[];
-    } & {
+    getSalesReport(startDate?: string, endDate?: string): Promise<{
         number: string;
         id: string;
         createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        companyId: string;
-        userId: string;
         type: string;
-        discount: number;
-        tax: number;
+        partner: {
+            name: string;
+        };
         total: number;
-        notes: string | null;
-        status: string;
-        partnerId: string | null;
-        validUntil: Date | null;
-    })[]>;
+    }[]>;
+    getPurchaseReport(startDate?: string, endDate?: string): Promise<{
+        number: string;
+        id: string;
+        createdAt: Date;
+        type: string;
+        partner: {
+            name: string;
+        };
+        total: number;
+    }[]>;
     getInventoryReport(): Promise<({
         warehouse: {
             id: string;
@@ -183,6 +136,7 @@ export declare class ReportsController {
             status: string;
             partnerId: string | null;
             validUntil: Date | null;
+            orderDate: Date;
         })[];
         lowStockProducts: ({
             warehouse: {
