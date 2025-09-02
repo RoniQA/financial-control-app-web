@@ -99,10 +99,31 @@ export declare class InventoryService {
         referenceId: string | null;
         reason: string | null;
     })[]>;
-    getStockSummary(companyId: string): Promise<(import(".prisma/client").Prisma.PickEnumerable<import(".prisma/client").Prisma.StockGroupByOutputType, "productId"[]> & {
-        _sum: {
-            quantity: number;
-            reserved: number;
+    getStockSummary(companyId: string): Promise<({
+        warehouse: {
+            id: string;
+            name: string;
+            code: string;
         };
+        product: {
+            id: string;
+            name: string;
+            sku: string;
+            unit: string;
+        };
+    } & {
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        productId: string;
+        quantity: number;
+        reserved: number;
+        minStock: number | null;
+        maxStock: number | null;
+        location: string | null;
+        batch: string | null;
+        serial: string | null;
+        expiryDate: Date | null;
+        warehouseId: string;
     })[]>;
 }

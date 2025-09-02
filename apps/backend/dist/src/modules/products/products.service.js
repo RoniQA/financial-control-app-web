@@ -17,6 +17,17 @@ let ProductsService = class ProductsService {
         this.prisma = prisma;
     }
     async create(createProductDto) {
+        const existingProduct = await this.prisma.product.findUnique({
+            where: {
+                companyId_sku: {
+                    companyId: createProductDto.companyId,
+                    sku: createProductDto.sku,
+                },
+            },
+        });
+        if (existingProduct) {
+            throw new Error(`SKU '${createProductDto.sku}' já existe para esta empresa`);
+        }
         return this.prisma.product.create({
             data: createProductDto,
             include: {

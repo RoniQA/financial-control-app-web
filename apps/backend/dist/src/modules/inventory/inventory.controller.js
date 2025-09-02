@@ -29,7 +29,7 @@ let InventoryController = class InventoryController {
         return this.inventoryService.getStockMoves(productId, warehouseId);
     }
     async getStockSummary() {
-        const companyId = 'temp-company-id';
+        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
         return this.inventoryService.getStockSummary(companyId);
     }
 };

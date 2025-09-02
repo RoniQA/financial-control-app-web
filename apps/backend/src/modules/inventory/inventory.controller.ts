@@ -34,7 +34,7 @@ export class InventoryController {
   @ApiResponse({ status: 200, description: 'Resumo do estoque' })
   async getStockSummary() {
     // TODO: Get companyId from JWT token
-    const companyId = 'temp-company-id';
+    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
     return this.inventoryService.getStockSummary(companyId);
   }
 }

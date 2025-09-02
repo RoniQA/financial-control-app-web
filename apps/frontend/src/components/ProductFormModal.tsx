@@ -119,8 +119,9 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
       let finalSku = data.sku
       if (!product && (!data.sku || data.sku.trim() === '')) {
         const timestamp = Date.now().toString()
-        const random = Math.random().toString(36).substring(2, 8).toUpperCase()
-        finalSku = `PROD-${timestamp.slice(-6)}-${random}`
+        const random1 = Math.random().toString(36).substring(2, 6).toUpperCase()
+        const random2 = Math.random().toString(36).substring(2, 6).toUpperCase()
+        finalSku = `PROD-${timestamp.slice(-8)}-${random1}-${random2}`
       }
 
       const productData = {
@@ -186,13 +187,15 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
         
         // Create initial stock if quantity > 0
         if (data.initialQuantity > 0) {
-          await api.post('/inventory/stock-moves', {
+          console.log('Creating initial stock for product:', response.data.id, 'quantity:', data.initialQuantity)
+          const stockMoveResponse = await api.post('/inventory/stock-moves', {
             productId: response.data.id,
             warehouseId: 'cmf1uv2n8000az0axienbav97', // Estoque Principal
             type: 'IN',
             quantity: data.initialQuantity,
             reason: 'INITIAL_STOCK',
           })
+          console.log('Stock move response:', stockMoveResponse.data)
         }
         
         toast.success('Produto criado com sucesso!')
@@ -202,7 +205,17 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
       onSuccess()
       onClose()
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao salvar produto')
+      console.error('Erro ao salvar produto:', error)
+      
+      let errorMessage = 'Erro ao salvar produto'
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      toast.error(errorMessage)
     } finally {
       setIsLoading(false)
     }
