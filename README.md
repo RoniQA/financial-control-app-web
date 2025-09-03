@@ -63,16 +63,27 @@ Sistema web completo para gestão de materiais agropecuários e automação elet
 ## 🚀 Instalação e Execução
 
 ### 🏭 **Para Produção**
-📖 **Guia completo**: [PRODUCTION.md](PRODUCTION.md)
+
+**🚀 Deploy Rápido:**
+📖 **Guia completo**: [DEPLOY_GUIDE.md](DEPLOY_GUIDE.md)
 
 ```bash
-# Deploy rápido para produção
+# Opção 1: Servidor próprio
 git checkout main
 cp env.prod.example .env.prod
 # Edite .env.prod com suas configurações
 chmod +x deploy.sh
 ./deploy.sh
+
+# Opção 2: Teste local primeiro
+chmod +x test-local.sh
+./test-local.sh
 ```
+
+**🌐 URLs de Acesso:**
+- **Local:** http://localhost:3000
+- **Externo:** http://SEU-IP:3000
+- **Com domínio:** https://seu-dominio.com
 
 ### Opção 1: Com Docker (Desenvolvimento)
 
