@@ -6,7 +6,6 @@ import {
   Warehouse, 
   Users, 
   ShoppingCart, 
-  FileText, 
   DollarSign, 
   Receipt, 
   BarChart3,

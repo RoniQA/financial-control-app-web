@@ -40,7 +40,7 @@ export function ReportsPage() {
 
   const exportSalesReport = () => {
     const headers = ['Número', 'Cliente', 'Status', 'Total', 'Data']
-    const data = salesReport?.map(order => ({
+    const data = salesReport?.map((order: any) => ({
       'Número': order.number,
       'Cliente': order.partner?.name || 'N/A',
       'Status': order.status,
@@ -53,7 +53,7 @@ export function ReportsPage() {
 
   const exportInventoryReport = () => {
     const headers = ['Produto', 'Depósito', 'Quantidade', 'Localização']
-    const data = inventoryReport?.map(stock => ({
+    const data = inventoryReport?.map((stock: any) => ({
       'Produto': stock.product.name,
       'Depósito': stock.warehouse.name,
       'Quantidade': stock.quantity,
@@ -65,7 +65,7 @@ export function ReportsPage() {
 
   const exportFinancialReport = () => {
     const headers = ['Tipo', 'Método', 'Valor Total', 'Quantidade de Transações']
-    const data = financialReport?.map(item => ({
+    const data = financialReport?.map((item: any) => ({
       'Tipo': item.type === 'INBOUND' ? 'Entradas' : 'Saídas',
       'Método': item.method,
       'Valor Total': item._sum?.amount?.toFixed(2) || '0.00',

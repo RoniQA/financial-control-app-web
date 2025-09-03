@@ -46,7 +46,7 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
     handleSubmit,
     formState: { errors },
     reset,
-    setValue,
+    // setValue,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -141,7 +141,7 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
 
       // Only include SKU for new products
       if (!product) {
-        productData.sku = finalSku
+        (productData as any).sku = finalSku
       }
 
       if (product) {

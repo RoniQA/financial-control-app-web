@@ -65,7 +65,7 @@ export function PartnerFormModal({ isOpen, onClose, onSuccess, partner }: Partne
     },
   })
 
-  const watchedType = watch('type')
+  // const watchedType = watch('type')
 
   const onSubmit = async (data: PartnerFormData) => {
     setIsLoading(true)

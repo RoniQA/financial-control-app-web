@@ -5,11 +5,7 @@ import {
   ShoppingCart, 
   FileText, 
   AlertTriangle, 
-  TrendingUp, 
-  TrendingDown,
-  Clock,
-  CheckCircle,
-  XCircle
+  CheckCircle
 } from 'lucide-react'
 import api from '../services/api'
 import { SalesPurchaseCharts } from '../components/SalesPurchaseCharts'

@@ -50,13 +50,13 @@ export function SalesPurchaseCharts() {
   const { startDate, endDate } = getDateRange(parseInt(period))
 
   // Fetch sales data
-  const { data: salesData, isLoading: salesLoading, error: salesError } = useQuery({
+  const { data: salesData, isLoading: salesLoading } = useQuery({
     queryKey: ['sales-report', startDate, endDate],
     queryFn: () => api.get(`/reports/sales?startDate=${startDate}&endDate=${endDate}`).then(res => res.data),
   })
 
   // Fetch purchases data
-  const { data: purchasesData, isLoading: purchasesLoading, error: purchasesError } = useQuery({
+  const { data: purchasesData, isLoading: purchasesLoading } = useQuery({
     queryKey: ['purchases-report', startDate, endDate],
     queryFn: () => api.get(`/reports/purchases?startDate=${startDate}&endDate=${endDate}`).then(res => res.data),
   })
