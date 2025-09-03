@@ -22,7 +22,7 @@ try {
   
   // Start the application
   console.log('🚀 Starting NestJS application...');
-  execSync('node dist/main.js', { 
+  execSync('node dist/src/main.js', { 
     stdio: 'inherit',
     cwd: __dirname 
   });
