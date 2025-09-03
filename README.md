@@ -291,13 +291,25 @@ npm run db:seed          # Popula com dados de exemplo
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
+## 🌿 Git Workflow
+
+Este projeto segue o **Git Flow** para organização de branches:
+
+- **`main`** - Branch de produção (estável, sempre deployável)
+- **`develop`** - Branch de desenvolvimento (integração de features)
+- **`feature/*`** - Branches para novas funcionalidades
+- **`hotfix/*`** - Branches para correções urgentes em produção
+
+📖 **Documentação completa**: [GIT_WORKFLOW.md](GIT_WORKFLOW.md)
+
 ## 🤝 Contribuição
 
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+2. Clone o repositório: `git clone <seu-fork>`
+3. Crie uma branch de feature: `git checkout -b feature/nome-da-feature`
+4. Faça suas alterações e commits seguindo as [convenções](GIT_WORKFLOW.md#convenções-de-commits)
+5. Push para sua branch: `git push origin feature/nome-da-feature`
+6. Abra um Pull Request para a branch `develop`
 
 ## 📞 Suporte
 
