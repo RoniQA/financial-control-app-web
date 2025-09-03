@@ -3,7 +3,7 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
-console.log('🚀 Starting Gestus Backend...');
+console.log('🚀 Starting Gestus Backend on Railway...');
 
 try {
   // Ensure we're in the correct directory
@@ -51,6 +51,18 @@ try {
   });
   
   console.log('✅ Prisma Client generated successfully');
+  
+  // Run database migrations
+  console.log('🔄 Running database migrations...');
+  try {
+    execSync('npx prisma migrate deploy', { 
+      stdio: 'inherit',
+      cwd: __dirname 
+    });
+    console.log('✅ Database migrations completed successfully');
+  } catch (migrationError) {
+    console.warn('⚠️ Migration failed, continuing anyway:', migrationError.message);
+  }
   
   // Start the application
   console.log('🚀 Starting NestJS application...');
