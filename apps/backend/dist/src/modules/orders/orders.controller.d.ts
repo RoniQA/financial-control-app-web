@@ -10,6 +10,7 @@ export declare class OrdersController {
             type: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             name: string;
             document: string;
@@ -19,17 +20,16 @@ export declare class OrdersController {
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
             isActive: boolean;
-            deletedAt: Date | null;
         };
         user: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             email: string;
             phone: string | null;
             isActive: boolean;
-            deletedAt: Date | null;
             password: string;
             firstName: string;
             lastName: string;
@@ -42,14 +42,14 @@ export declare class OrdersController {
         items: ({
             product: {
                 id: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                deletedAt: Date | null;
                 companyId: string;
                 name: string;
                 isActive: boolean;
-                deletedAt: Date | null;
                 sku: string;
+                description: string | null;
                 category: string | null;
                 brand: string | null;
                 model: string | null;
@@ -63,32 +63,32 @@ export declare class OrdersController {
             };
         } & {
             id: string;
-            orderId: string;
             total: number;
+            discount: number;
             tax: number;
             notes: string | null;
-            discount: number;
             quantity: number;
             unitPrice: number;
             productId: string;
+            orderId: string;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
-        createdAt: Date;
-        updatedAt: Date;
-        companyId: string;
-        partnerId: string | null;
-        userId: string;
-        deletedAt: Date | null;
         status: string;
         total: number;
+        discount: number;
         tax: number;
         notes: string | null;
-        discount: number;
         orderDate: Date;
         validUntil: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        partnerId: string | null;
+        userId: string;
+        companyId: string;
     }>;
     findAll(filters: any): Promise<({
         partner: {
@@ -96,6 +96,7 @@ export declare class OrdersController {
             type: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             name: string;
             document: string;
@@ -105,17 +106,16 @@ export declare class OrdersController {
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
             isActive: boolean;
-            deletedAt: Date | null;
         };
         user: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             email: string;
             phone: string | null;
             isActive: boolean;
-            deletedAt: Date | null;
             password: string;
             firstName: string;
             lastName: string;
@@ -128,14 +128,14 @@ export declare class OrdersController {
         items: ({
             product: {
                 id: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                deletedAt: Date | null;
                 companyId: string;
                 name: string;
                 isActive: boolean;
-                deletedAt: Date | null;
                 sku: string;
+                description: string | null;
                 category: string | null;
                 brand: string | null;
                 model: string | null;
@@ -149,32 +149,32 @@ export declare class OrdersController {
             };
         } & {
             id: string;
-            orderId: string;
             total: number;
+            discount: number;
             tax: number;
             notes: string | null;
-            discount: number;
             quantity: number;
             unitPrice: number;
             productId: string;
+            orderId: string;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
-        createdAt: Date;
-        updatedAt: Date;
-        companyId: string;
-        partnerId: string | null;
-        userId: string;
-        deletedAt: Date | null;
         status: string;
         total: number;
+        discount: number;
         tax: number;
         notes: string | null;
-        discount: number;
         orderDate: Date;
         validUntil: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        partnerId: string | null;
+        userId: string;
+        companyId: string;
     })[]>;
     findOne(id: string): Promise<{
         partner: {
@@ -182,6 +182,7 @@ export declare class OrdersController {
             type: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             name: string;
             document: string;
@@ -191,17 +192,16 @@ export declare class OrdersController {
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
             isActive: boolean;
-            deletedAt: Date | null;
         };
         user: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             email: string;
             phone: string | null;
             isActive: boolean;
-            deletedAt: Date | null;
             password: string;
             firstName: string;
             lastName: string;
@@ -214,14 +214,14 @@ export declare class OrdersController {
         items: ({
             product: {
                 id: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                deletedAt: Date | null;
                 companyId: string;
                 name: string;
                 isActive: boolean;
-                deletedAt: Date | null;
                 sku: string;
+                description: string | null;
                 category: string | null;
                 brand: string | null;
                 model: string | null;
@@ -235,32 +235,32 @@ export declare class OrdersController {
             };
         } & {
             id: string;
-            orderId: string;
             total: number;
+            discount: number;
             tax: number;
             notes: string | null;
-            discount: number;
             quantity: number;
             unitPrice: number;
             productId: string;
+            orderId: string;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
-        createdAt: Date;
-        updatedAt: Date;
-        companyId: string;
-        partnerId: string | null;
-        userId: string;
-        deletedAt: Date | null;
         status: string;
         total: number;
+        discount: number;
         tax: number;
         notes: string | null;
-        discount: number;
         orderDate: Date;
         validUntil: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        partnerId: string | null;
+        userId: string;
+        companyId: string;
     }>;
     update(id: string, updateOrderDto: UpdateOrderDto): Promise<{
         partner: {
@@ -268,6 +268,7 @@ export declare class OrdersController {
             type: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             name: string;
             document: string;
@@ -277,17 +278,16 @@ export declare class OrdersController {
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
             isActive: boolean;
-            deletedAt: Date | null;
         };
         user: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            deletedAt: Date | null;
             companyId: string;
             email: string;
             phone: string | null;
             isActive: boolean;
-            deletedAt: Date | null;
             password: string;
             firstName: string;
             lastName: string;
@@ -300,14 +300,14 @@ export declare class OrdersController {
         items: ({
             product: {
                 id: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
+                deletedAt: Date | null;
                 companyId: string;
                 name: string;
                 isActive: boolean;
-                deletedAt: Date | null;
                 sku: string;
+                description: string | null;
                 category: string | null;
                 brand: string | null;
                 model: string | null;
@@ -321,49 +321,49 @@ export declare class OrdersController {
             };
         } & {
             id: string;
-            orderId: string;
             total: number;
+            discount: number;
             tax: number;
             notes: string | null;
-            discount: number;
             quantity: number;
             unitPrice: number;
             productId: string;
+            orderId: string;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
-        createdAt: Date;
-        updatedAt: Date;
-        companyId: string;
-        partnerId: string | null;
-        userId: string;
-        deletedAt: Date | null;
         status: string;
         total: number;
+        discount: number;
         tax: number;
         notes: string | null;
-        discount: number;
         orderDate: Date;
         validUntil: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        partnerId: string | null;
+        userId: string;
+        companyId: string;
     }>;
     remove(id: string): Promise<{
         number: string;
         id: string;
         type: string;
-        createdAt: Date;
-        updatedAt: Date;
-        companyId: string;
-        partnerId: string | null;
-        userId: string;
-        deletedAt: Date | null;
         status: string;
         total: number;
+        discount: number;
         tax: number;
         notes: string | null;
-        discount: number;
         orderDate: Date;
         validUntil: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        partnerId: string | null;
+        userId: string;
+        companyId: string;
     }>;
 }

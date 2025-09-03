@@ -28,13 +28,7 @@ export function FinancialPage() {
 
   const { data: notifications, isLoading: notificationsLoading } = useQuery({
     queryKey: ['financial-notifications'],
-    queryFn: () => {
-      console.log('🔍 Fetching financial notifications...');
-      return api.get('/financial/notifications').then(res => {
-        console.log('📊 Notifications received:', res.data);
-        return res.data;
-      });
-    },
+    queryFn: () => api.get('/financial/notifications').then(res => res.data),
   })
 
   if (isLoading || notificationsLoading) {

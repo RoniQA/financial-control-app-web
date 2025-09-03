@@ -104,8 +104,7 @@ let FinancialService = class FinancialService {
         });
     }
     async getFinancialNotifications(companyId) {
-        console.log('🔍 Fetching financial notifications for company:', companyId);
-        const notifications = await this.prisma.financialNotification.findMany({
+        return this.prisma.financialNotification.findMany({
             where: {
                 companyId,
                 status: 'PENDING',
@@ -124,8 +123,6 @@ let FinancialService = class FinancialService {
                 createdAt: 'desc',
             },
         });
-        console.log('📊 Found', notifications.length, 'pending notifications');
-        return notifications;
     }
     async approveFinancialNotification(notificationId, companyId) {
         const notification = await this.prisma.financialNotification.findFirst({

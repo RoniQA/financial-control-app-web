@@ -108,9 +108,7 @@ export class FinancialService {
   }
 
   async getFinancialNotifications(companyId: string) {
-    console.log('🔍 Fetching financial notifications for company:', companyId);
-    
-    const notifications = await this.prisma.financialNotification.findMany({
+    return this.prisma.financialNotification.findMany({
       where: {
         companyId,
         status: 'PENDING',
@@ -129,9 +127,6 @@ export class FinancialService {
         createdAt: 'desc',
       },
     });
-
-    console.log('📊 Found', notifications.length, 'pending notifications');
-    return notifications;
   }
 
   async approveFinancialNotification(notificationId: string, companyId: string) {

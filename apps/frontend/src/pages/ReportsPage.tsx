@@ -1,11 +1,79 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Download, Calendar, BarChart3 } from 'lucide-react'
+import { toast } from 'react-hot-toast'
 import api from '../services/api'
 
 export function ReportsPage() {
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+
+  // Export functions
+  const exportToCSV = (data: any[], filename: string, headers: string[]) => {
+    if (!data || data.length === 0) {
+      toast.error('Nenhum dado para exportar')
+      return
+    }
+
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row => 
+        headers.map(header => {
+          const value = row[header] || ''
+          return `"${String(value).replace(/"/g, '""')}"`
+        }).join(',')
+      )
+    ].join('\n')
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    toast.success('Relatório exportado com sucesso!')
+  }
+
+  const exportSalesReport = () => {
+    const headers = ['Número', 'Cliente', 'Status', 'Total', 'Data']
+    const data = salesReport?.map(order => ({
+      'Número': order.number,
+      'Cliente': order.partner?.name || 'N/A',
+      'Status': order.status,
+      'Total': order.total?.toFixed(2) || '0.00',
+      'Data': new Date(order.createdAt).toLocaleDateString('pt-BR')
+    })) || []
+    
+    exportToCSV(data, 'relatorio_vendas', headers)
+  }
+
+  const exportInventoryReport = () => {
+    const headers = ['Produto', 'Depósito', 'Quantidade', 'Localização']
+    const data = inventoryReport?.map(stock => ({
+      'Produto': stock.product.name,
+      'Depósito': stock.warehouse.name,
+      'Quantidade': stock.quantity,
+      'Localização': stock.location || 'N/A'
+    })) || []
+    
+    exportToCSV(data, 'relatorio_estoque', headers)
+  }
+
+  const exportFinancialReport = () => {
+    const headers = ['Tipo', 'Método', 'Valor Total', 'Quantidade de Transações']
+    const data = financialReport?.map(item => ({
+      'Tipo': item.type === 'INBOUND' ? 'Entradas' : 'Saídas',
+      'Método': item.method,
+      'Valor Total': item._sum?.amount?.toFixed(2) || '0.00',
+      'Quantidade de Transações': item._count?.id || 0
+    })) || []
+    
+    exportToCSV(data, 'relatorio_financeiro', headers)
+  }
 
   const { data: salesReport, isLoading: salesLoading } = useQuery({
     queryKey: ['sales-report', startDate, endDate],
@@ -93,7 +161,10 @@ export function ReportsPage() {
             <h3 className="text-lg leading-6 font-medium text-gray-900">
               Relatório de Vendas
             </h3>
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center">
+            <button 
+              onClick={exportSalesReport}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center"
+            >
               <Download className="h-4 w-4 mr-2" />
               Exportar
             </button>
@@ -158,7 +229,10 @@ export function ReportsPage() {
             <h3 className="text-lg leading-6 font-medium text-gray-900">
               Relatório de Estoque
             </h3>
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center">
+            <button 
+              onClick={exportInventoryReport}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center"
+            >
               <Download className="h-4 w-4 mr-2" />
               Exportar
             </button>
@@ -211,7 +285,10 @@ export function ReportsPage() {
             <h3 className="text-lg leading-6 font-medium text-gray-900">
               Relatório Financeiro
             </h3>
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center">
+            <button 
+              onClick={exportFinancialReport}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center"
+            >
               <Download className="h-4 w-4 mr-2" />
               Exportar
             </button>

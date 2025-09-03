@@ -158,7 +158,6 @@ export class OrdersService {
 
     // Handle stock updates based on status changes
     if (updateOrderDto.status && updateOrderDto.status !== existingOrder.status) {
-      console.log('🔄 Status changed from', existingOrder.status, 'to', updateOrderDto.status);
       await this.handleStockUpdate(existingOrder, updatedOrder);
     }
 
@@ -224,15 +223,12 @@ export class OrdersService {
     }
       // Check if we should create financial notification
       if (newStatus === 'COMPLETED') {
-        console.log('💰 Order completed, creating financial notification for:', updatedOrder.number);
         await this.createFinancialNotification(updatedOrder);
       }
     }
 
     private async createFinancialNotification(order: any) {
       try {
-        console.log('🔍 Creating financial notification for order:', order.number, 'Type:', order.type, 'Total:', order.total);
-        
         // Check if payment already exists for this order
         const existingPayment = await this.prisma.payment.findFirst({
           where: {
@@ -242,7 +238,6 @@ export class OrdersService {
         });
 
         if (existingPayment) {
-          console.log('⚠️ Payment already exists for order:', order.number);
           return;
         }
 
@@ -255,7 +250,6 @@ export class OrdersService {
         });
 
         if (existingNotification) {
-          console.log('⚠️ Notification already exists for order:', order.number);
           return;
         }
 
@@ -274,10 +268,8 @@ export class OrdersService {
             userId: order.userId,
           },
         });
-
-        console.log('✅ Financial notification created:', notification.id);
       } catch (error) {
-        console.error('❌ Error creating financial notification:', error);
+        console.error('Error creating financial notification:', error);
       }
     }
 }
