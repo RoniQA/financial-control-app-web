@@ -5,8 +5,7 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": ["**/*.prisma"],
-    "watchAssets": true,
-    "builder": "webpack"
+    "watchAssets": true
   }
 }
 
