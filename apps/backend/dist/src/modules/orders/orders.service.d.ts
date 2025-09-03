@@ -71,16 +71,18 @@ export declare class OrdersService {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -90,8 +92,6 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
     findAll(companyId: string, filters?: any): Promise<({
@@ -157,16 +157,18 @@ export declare class OrdersService {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -176,8 +178,6 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     })[]>;
     findById(id: string): Promise<{
@@ -243,16 +243,18 @@ export declare class OrdersService {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -262,8 +264,6 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
     update(id: string, updateOrderDto: UpdateOrderDto, companyId: string): Promise<{
@@ -329,16 +329,18 @@ export declare class OrdersService {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -348,8 +350,6 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
     remove(id: string): Promise<{
@@ -357,6 +357,8 @@ export declare class OrdersService {
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -366,8 +368,6 @@ export declare class OrdersService {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
     private handleStockUpdate;

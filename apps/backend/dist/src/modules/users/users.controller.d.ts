@@ -7,23 +7,23 @@ export declare class UsersController {
     create(createUserDto: CreateUserDto): Promise<{
         company: {
             id: string;
-            cnpj: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
             name: string;
             ie: string | null;
             email: string;
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
+            cnpj: string;
             fiscalConfig: import("@prisma/client/runtime/library").JsonValue | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
         };
         roles: ({
             role: {
                 id: string;
-                name: string;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
                 description: string | null;
                 permissions: import("@prisma/client/runtime/library").JsonValue;
             };
@@ -34,42 +34,42 @@ export declare class UsersController {
         })[];
     } & {
         id: string;
-        email: string;
-        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        companyId: string;
+        email: string;
+        phone: string | null;
+        isActive: boolean;
         password: string;
         firstName: string;
         lastName: string;
-        isActive: boolean;
         lastLogin: Date | null;
         failedLogins: number;
         lockedUntil: Date | null;
         mfaEnabled: boolean;
         mfaSecret: string | null;
-        companyId: string;
     }>;
     findAll(): Promise<({
         company: {
             id: string;
-            cnpj: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
             name: string;
             ie: string | null;
             email: string;
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
+            cnpj: string;
             fiscalConfig: import("@prisma/client/runtime/library").JsonValue | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
         };
         roles: ({
             role: {
                 id: string;
-                name: string;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
                 description: string | null;
                 permissions: import("@prisma/client/runtime/library").JsonValue;
             };
@@ -80,42 +80,42 @@ export declare class UsersController {
         })[];
     } & {
         id: string;
-        email: string;
-        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        companyId: string;
+        email: string;
+        phone: string | null;
+        isActive: boolean;
         password: string;
         firstName: string;
         lastName: string;
-        isActive: boolean;
         lastLogin: Date | null;
         failedLogins: number;
         lockedUntil: Date | null;
         mfaEnabled: boolean;
         mfaSecret: string | null;
-        companyId: string;
     })[]>;
     findOne(id: string): Promise<{
         company: {
             id: string;
-            cnpj: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
             name: string;
             ie: string | null;
             email: string;
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
+            cnpj: string;
             fiscalConfig: import("@prisma/client/runtime/library").JsonValue | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
         };
         roles: ({
             role: {
                 id: string;
-                name: string;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
                 description: string | null;
                 permissions: import("@prisma/client/runtime/library").JsonValue;
             };
@@ -126,42 +126,42 @@ export declare class UsersController {
         })[];
     } & {
         id: string;
-        email: string;
-        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        companyId: string;
+        email: string;
+        phone: string | null;
+        isActive: boolean;
         password: string;
         firstName: string;
         lastName: string;
-        isActive: boolean;
         lastLogin: Date | null;
         failedLogins: number;
         lockedUntil: Date | null;
         mfaEnabled: boolean;
         mfaSecret: string | null;
-        companyId: string;
     }>;
     update(id: string, updateUserDto: UpdateUserDto): Promise<{
         company: {
             id: string;
-            cnpj: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
             name: string;
             ie: string | null;
             email: string;
             phone: string | null;
             address: import("@prisma/client/runtime/library").JsonValue | null;
+            cnpj: string;
             fiscalConfig: import("@prisma/client/runtime/library").JsonValue | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
         };
         roles: ({
             role: {
                 id: string;
-                name: string;
                 createdAt: Date;
                 updatedAt: Date;
+                name: string;
                 description: string | null;
                 permissions: import("@prisma/client/runtime/library").JsonValue;
             };
@@ -172,39 +172,39 @@ export declare class UsersController {
         })[];
     } & {
         id: string;
-        email: string;
-        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        companyId: string;
+        email: string;
+        phone: string | null;
+        isActive: boolean;
         password: string;
         firstName: string;
         lastName: string;
-        isActive: boolean;
         lastLogin: Date | null;
         failedLogins: number;
         lockedUntil: Date | null;
         mfaEnabled: boolean;
         mfaSecret: string | null;
-        companyId: string;
     }>;
     remove(id: string): Promise<{
         id: string;
-        email: string;
-        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        companyId: string;
+        email: string;
+        phone: string | null;
+        isActive: boolean;
         password: string;
         firstName: string;
         lastName: string;
-        isActive: boolean;
         lastLogin: Date | null;
         failedLogins: number;
         lockedUntil: Date | null;
         mfaEnabled: boolean;
         mfaSecret: string | null;
-        companyId: string;
     }>;
     assignRole(userId: string, roleId: string): Promise<{
         id: string;

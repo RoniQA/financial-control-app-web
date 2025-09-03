@@ -4,27 +4,16 @@ export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
     createStockMove(createStockMoveDto: CreateStockMoveDto): Promise<{
-        warehouse: {
-            id: string;
-            name: string;
-            address: import("@prisma/client/runtime/library").JsonValue | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-            isActive: boolean;
-            companyId: string;
-            code: string;
-        };
         product: {
             id: string;
-            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
-            description: string | null;
-            isActive: boolean;
             companyId: string;
+            name: string;
+            isActive: boolean;
             sku: string;
+            description: string | null;
             category: string | null;
             brand: string | null;
             model: string | null;
@@ -36,43 +25,43 @@ export declare class InventoryController {
             dimensions: import("@prisma/client/runtime/library").JsonValue | null;
             isService: boolean;
         };
+        warehouse: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
+            companyId: string;
+            name: string;
+            address: import("@prisma/client/runtime/library").JsonValue | null;
+            isActive: boolean;
+            code: string;
+        };
     } & {
         id: string;
+        type: string;
         createdAt: Date;
         productId: string;
+        warehouseId: string;
         quantity: number;
         batch: string | null;
         serial: string | null;
-        warehouseId: string;
-        type: string;
-        unitCost: number | null;
-        totalCost: number | null;
         reference: string | null;
         referenceId: string | null;
+        unitCost: number | null;
+        totalCost: number | null;
         reason: string | null;
     }>;
     getStockMoves(productId?: string, warehouseId?: string): Promise<({
-        warehouse: {
-            id: string;
-            name: string;
-            address: import("@prisma/client/runtime/library").JsonValue | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-            isActive: boolean;
-            companyId: string;
-            code: string;
-        };
         product: {
             id: string;
-            name: string;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
-            description: string | null;
-            isActive: boolean;
             companyId: string;
+            name: string;
+            isActive: boolean;
             sku: string;
+            description: string | null;
             category: string | null;
             brand: string | null;
             model: string | null;
@@ -84,38 +73,50 @@ export declare class InventoryController {
             dimensions: import("@prisma/client/runtime/library").JsonValue | null;
             isService: boolean;
         };
+        warehouse: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
+            companyId: string;
+            name: string;
+            address: import("@prisma/client/runtime/library").JsonValue | null;
+            isActive: boolean;
+            code: string;
+        };
     } & {
         id: string;
+        type: string;
         createdAt: Date;
         productId: string;
+        warehouseId: string;
         quantity: number;
         batch: string | null;
         serial: string | null;
-        warehouseId: string;
-        type: string;
-        unitCost: number | null;
-        totalCost: number | null;
         reference: string | null;
         referenceId: string | null;
+        unitCost: number | null;
+        totalCost: number | null;
         reason: string | null;
     })[]>;
     getStockSummary(): Promise<({
-        warehouse: {
-            id: string;
-            name: string;
-            code: string;
-        };
         product: {
             id: string;
             name: string;
             sku: string;
             unit: string;
+        };
+        warehouse: {
+            id: string;
+            name: string;
+            code: string;
         };
     } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
         productId: string;
+        warehouseId: string;
         quantity: number;
         reserved: number;
         minStock: number | null;
@@ -124,6 +125,5 @@ export declare class InventoryController {
         batch: string | null;
         serial: string | null;
         expiryDate: Date | null;
-        warehouseId: string;
     })[]>;
 }

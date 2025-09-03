@@ -67,16 +67,18 @@ export declare class OrdersController {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -86,8 +88,6 @@ export declare class OrdersController {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
     findAll(filters: any): Promise<({
@@ -153,16 +153,18 @@ export declare class OrdersController {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -172,8 +174,6 @@ export declare class OrdersController {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     })[]>;
     findOne(id: string): Promise<{
@@ -239,16 +239,18 @@ export declare class OrdersController {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -258,8 +260,6 @@ export declare class OrdersController {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
     update(id: string, updateOrderDto: UpdateOrderDto): Promise<{
@@ -325,16 +325,18 @@ export declare class OrdersController {
             discount: number;
             tax: number;
             notes: string | null;
-            quantity: number;
-            unitPrice: number;
             productId: string;
+            quantity: number;
             orderId: string;
+            unitPrice: number;
         })[];
     } & {
         number: string;
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -344,8 +346,6 @@ export declare class OrdersController {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
     remove(id: string): Promise<{
@@ -353,6 +353,8 @@ export declare class OrdersController {
         id: string;
         type: string;
         status: string;
+        partnerId: string | null;
+        userId: string;
         total: number;
         discount: number;
         tax: number;
@@ -362,8 +364,6 @@ export declare class OrdersController {
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        partnerId: string | null;
-        userId: string;
         companyId: string;
     }>;
 }

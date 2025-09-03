@@ -20,7 +20,10 @@ let PrismaService = class PrismaService extends client_1.PrismaClient {
         if (process.env.NODE_ENV === 'production')
             return;
         const models = Reflect.ownKeys(this).filter(key => key[0] !== '_');
-        return Promise.all(models.map((modelKey) => this[modelKey].deleteMany()));
+        return Promise.all(models.map((modelKey) => {
+            const model = this[modelKey];
+            return model.deleteMany();
+        }));
     }
 };
 exports.PrismaService = PrismaService;
