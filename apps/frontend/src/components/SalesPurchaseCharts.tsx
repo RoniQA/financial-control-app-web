@@ -156,27 +156,35 @@ export function SalesPurchaseCharts() {
 
   if (salesLoading || purchasesLoading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft border border-white/20 p-8">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-200 border-t-primary-600"></div>
+            <p className="text-secondary-600 font-medium">Carregando gráficos...</p>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg shadow">
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Vendas vs Compras</h2>
+    <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft border border-white/20 overflow-hidden">
+      <div className="p-6 border-b border-white/20 bg-gradient-to-r from-primary-50 to-accent-50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-primary-100 rounded-lg">
+              <TrendingUp className="h-5 w-5 text-primary-600" />
+            </div>
+            <h2 className="text-xl font-semibold text-secondary-900">Vendas vs Compras</h2>
+          </div>
           <div className="flex items-center space-x-4">
             {/* Period Filter */}
             <div className="flex items-center space-x-2">
-              <Calendar className="h-4 w-4 text-gray-500" />
+              <Calendar className="h-4 w-4 text-secondary-500" />
               <select
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}
-                className="text-sm border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="text-sm border border-white/20 rounded-xl px-3 py-2 bg-white/60 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               >
                 <option value="7">Últimos 7 dias</option>
                 <option value="30">Últimos 30 dias</option>
@@ -186,23 +194,23 @@ export function SalesPurchaseCharts() {
             </div>
 
             {/* Chart Type Filter */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 bg-white/60 backdrop-blur-sm rounded-xl p-1">
               <button
                 onClick={() => setChartType('line')}
-                className={`px-3 py-1 text-sm rounded-md ${
+                className={`px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
                   chartType === 'line'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-primary-500 text-white shadow-glow'
+                    : 'text-secondary-600 hover:text-primary-600 hover:bg-white/80'
                 }`}
               >
                 Linha
               </button>
               <button
                 onClick={() => setChartType('bar')}
-                className={`px-3 py-1 text-sm rounded-md ${
+                className={`px-4 py-2 text-sm rounded-lg transition-all duration-200 ${
                   chartType === 'bar'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-primary-500 text-white shadow-glow'
+                    : 'text-secondary-600 hover:text-primary-600 hover:bg-white/80'
                 }`}
               >
                 Barras
@@ -214,43 +222,55 @@ export function SalesPurchaseCharts() {
 
       <div className="p-6">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-green-50 rounded-lg p-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="group bg-gradient-to-r from-success-50 to-success-100/50 rounded-2xl p-6 border border-success-200 hover:shadow-glow-success transition-all duration-300 hover:scale-105">
             <div className="flex items-center">
-              <TrendingUp className="h-5 w-5 text-green-600" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-green-600">Total Vendas</p>
-                <p className="text-lg font-bold text-green-900">
+              <div className="p-3 bg-success-100 rounded-xl">
+                <TrendingUp className="h-6 w-6 text-success-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-success-600">Total Vendas</p>
+                <p className="text-2xl font-bold text-success-900">
                   R$ {totalSales.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-red-50 rounded-lg p-4">
+          <div className="group bg-gradient-to-r from-danger-50 to-danger-100/50 rounded-2xl p-6 border border-danger-200 hover:shadow-glow-danger transition-all duration-300 hover:scale-105">
             <div className="flex items-center">
-              <TrendingDown className="h-5 w-5 text-red-600" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-red-600">Total Compras</p>
-                <p className="text-lg font-bold text-red-900">
+              <div className="p-3 bg-danger-100 rounded-xl">
+                <TrendingDown className="h-6 w-6 text-danger-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-danger-600">Total Compras</p>
+                <p className="text-2xl font-bold text-danger-900">
                   R$ {totalPurchases.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className={`rounded-lg p-4 ${netResult >= 0 ? 'bg-blue-50' : 'bg-orange-50'}`}>
+          <div className={`group rounded-2xl p-6 border transition-all duration-300 hover:scale-105 ${
+            netResult >= 0 
+              ? 'bg-gradient-to-r from-primary-50 to-primary-100/50 border-primary-200 hover:shadow-glow' 
+              : 'bg-gradient-to-r from-warning-50 to-warning-100/50 border-warning-200 hover:shadow-glow-warning'
+          }`}>
             <div className="flex items-center">
-              {netResult >= 0 ? (
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-              ) : (
-                <TrendingDown className="h-5 w-5 text-orange-600" />
-              )}
-              <div className="ml-3">
-                <p className={`text-sm font-medium ${netResult >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>
+              <div className={`p-3 rounded-xl ${
+                netResult >= 0 ? 'bg-primary-100' : 'bg-warning-100'
+              }`}>
+                {netResult >= 0 ? (
+                  <TrendingUp className="h-6 w-6 text-primary-600" />
+                ) : (
+                  <TrendingDown className="h-6 w-6 text-warning-600" />
+                )}
+              </div>
+              <div className="ml-4">
+                <p className={`text-sm font-medium ${netResult >= 0 ? 'text-primary-600' : 'text-warning-600'}`}>
                   Resultado Líquido
                 </p>
-                <p className={`text-lg font-bold ${netResult >= 0 ? 'text-blue-900' : 'text-orange-900'}`}>
+                <p className={`text-2xl font-bold ${netResult >= 0 ? 'text-primary-900' : 'text-warning-900'}`}>
                   R$ {netResult.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -259,12 +279,14 @@ export function SalesPurchaseCharts() {
         </div>
 
         {/* Chart */}
-        <div className="h-96">
-          {chartType === 'line' ? (
-            <Line options={options} data={data} />
-          ) : (
-            <Bar options={options} data={data} />
-          )}
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+          <div className="h-96">
+            {chartType === 'line' ? (
+              <Line options={options} data={data} />
+            ) : (
+              <Bar options={options} data={data} />
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { OrdersPage } from './pages/OrdersPage'
 import { FinancialPage } from './pages/FinancialPage'
 import { FiscalPage } from './pages/FiscalPage'
 import { ReportsPage } from './pages/ReportsPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 function App() {
   const { isAuthenticated } = useAuthStore()
@@ -38,6 +39,7 @@ function App() {
         <Route path="/financial" element={<FinancialPage />} />
         <Route path="/fiscal" element={<FiscalPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Layout>

@@ -17,20 +17,20 @@ export declare class AuthController {
     }>;
     register(registerDto: RegisterDto): Promise<{
         id: string;
+        email: string;
+        phone: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
-        companyId: string;
-        email: string;
-        phone: string | null;
-        isActive: boolean;
         firstName: string;
         lastName: string;
+        isActive: boolean;
         lastLogin: Date | null;
         failedLogins: number;
         lockedUntil: Date | null;
         mfaEnabled: boolean;
         mfaSecret: string | null;
+        companyId: string;
     }>;
     refresh(refreshToken: string): Promise<{
         accessToken: string;

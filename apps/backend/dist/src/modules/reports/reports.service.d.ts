@@ -5,24 +5,35 @@ export declare class ReportsService {
     getSalesReport(companyId: string, startDate?: Date, endDate?: Date): Promise<{
         number: string;
         id: string;
-        type: string;
-        total: number;
         createdAt: Date;
+        type: string;
         partner: {
             name: string;
         };
+        total: number;
     }[]>;
     getInventoryReport(companyId: string): Promise<({
-        product: {
+        warehouse: {
             id: string;
+            name: string;
+            address: import("@prisma/client/runtime/library").JsonValue | null;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
-            companyId: string;
-            name: string;
             isActive: boolean;
-            sku: string;
+            companyId: string;
+            code: string;
+        };
+        product: {
+            id: string;
+            name: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
             description: string | null;
+            isActive: boolean;
+            companyId: string;
+            sku: string;
             category: string | null;
             brand: string | null;
             model: string | null;
@@ -34,23 +45,11 @@ export declare class ReportsService {
             dimensions: import("@prisma/client/runtime/library").JsonValue | null;
             isService: boolean;
         };
-        warehouse: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-            companyId: string;
-            name: string;
-            address: import("@prisma/client/runtime/library").JsonValue | null;
-            isActive: boolean;
-            code: string;
-        };
     } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
         productId: string;
-        warehouseId: string;
         quantity: number;
         reserved: number;
         minStock: number | null;
@@ -59,16 +58,17 @@ export declare class ReportsService {
         batch: string | null;
         serial: string | null;
         expiryDate: Date | null;
+        warehouseId: string;
     })[]>;
     getPurchaseReport(companyId: string, startDate?: Date, endDate?: Date): Promise<{
         number: string;
         id: string;
-        type: string;
-        total: number;
         createdAt: Date;
+        type: string;
         partner: {
             name: string;
         };
+        total: number;
     }[]>;
     getFinancialReport(companyId: string, startDate?: Date, endDate?: Date): Promise<(import(".prisma/client").Prisma.PickEnumerable<import(".prisma/client").Prisma.PaymentGroupByOutputType, ("type" | "method")[]> & {
         _count: {
@@ -86,69 +86,80 @@ export declare class ReportsService {
             invoices: number;
         };
         recentOrders: ({
-            partner: {
-                id: string;
-                type: string;
-                createdAt: Date;
-                updatedAt: Date;
-                deletedAt: Date | null;
-                companyId: string;
-                name: string;
-                document: string;
-                ie: string | null;
-                im: string | null;
-                email: string | null;
-                phone: string | null;
-                address: import("@prisma/client/runtime/library").JsonValue | null;
-                isActive: boolean;
-            };
             user: {
                 id: string;
+                email: string;
+                phone: string | null;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
-                companyId: string;
-                email: string;
-                phone: string | null;
-                isActive: boolean;
                 password: string;
                 firstName: string;
                 lastName: string;
+                isActive: boolean;
                 lastLogin: Date | null;
                 failedLogins: number;
                 lockedUntil: Date | null;
                 mfaEnabled: boolean;
                 mfaSecret: string | null;
+                companyId: string;
+            };
+            partner: {
+                id: string;
+                name: string;
+                ie: string | null;
+                email: string | null;
+                phone: string | null;
+                address: import("@prisma/client/runtime/library").JsonValue | null;
+                createdAt: Date;
+                updatedAt: Date;
+                deletedAt: Date | null;
+                isActive: boolean;
+                companyId: string;
+                type: string;
+                document: string;
+                im: string | null;
             };
         } & {
             number: string;
             id: string;
-            type: string;
-            status: string;
-            partnerId: string | null;
-            userId: string;
-            total: number;
-            discount: number;
-            tax: number;
-            notes: string | null;
-            orderDate: Date;
-            validUntil: Date | null;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
             companyId: string;
+            userId: string;
+            type: string;
+            discount: number;
+            tax: number;
+            total: number;
+            notes: string | null;
+            status: string;
+            partnerId: string | null;
+            validUntil: Date | null;
+            orderDate: Date;
         })[];
         lowStockProducts: ({
-            product: {
+            warehouse: {
                 id: string;
+                name: string;
+                address: import("@prisma/client/runtime/library").JsonValue | null;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
-                companyId: string;
-                name: string;
                 isActive: boolean;
-                sku: string;
+                companyId: string;
+                code: string;
+            };
+            product: {
+                id: string;
+                name: string;
+                createdAt: Date;
+                updatedAt: Date;
+                deletedAt: Date | null;
                 description: string | null;
+                isActive: boolean;
+                companyId: string;
+                sku: string;
                 category: string | null;
                 brand: string | null;
                 model: string | null;
@@ -160,23 +171,11 @@ export declare class ReportsService {
                 dimensions: import("@prisma/client/runtime/library").JsonValue | null;
                 isService: boolean;
             };
-            warehouse: {
-                id: string;
-                createdAt: Date;
-                updatedAt: Date;
-                deletedAt: Date | null;
-                companyId: string;
-                name: string;
-                address: import("@prisma/client/runtime/library").JsonValue | null;
-                isActive: boolean;
-                code: string;
-            };
         } & {
             id: string;
             createdAt: Date;
             updatedAt: Date;
             productId: string;
-            warehouseId: string;
             quantity: number;
             reserved: number;
             minStock: number | null;
@@ -185,6 +184,7 @@ export declare class ReportsService {
             batch: string | null;
             serial: string | null;
             expiryDate: Date | null;
+            warehouseId: string;
         })[];
     }>;
 }
