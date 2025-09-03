@@ -62,7 +62,19 @@ Sistema web completo para gestão de materiais agropecuários e automação elet
 
 ## 🚀 Instalação e Execução
 
-### Opção 1: Com Docker (Recomendado)
+### 🏭 **Para Produção**
+📖 **Guia completo**: [PRODUCTION.md](PRODUCTION.md)
+
+```bash
+# Deploy rápido para produção
+git checkout main
+cp env.prod.example .env.prod
+# Edite .env.prod com suas configurações
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### Opção 1: Com Docker (Desenvolvimento)
 
 #### 1. Instale o Docker Desktop
 - **Windows**: Baixe e instale o [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
