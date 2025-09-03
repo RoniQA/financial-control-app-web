@@ -25,6 +25,7 @@ const financial_module_1 = require("./modules/financial/financial.module");
 const fiscal_module_1 = require("./modules/fiscal/fiscal.module");
 const reports_module_1 = require("./modules/reports/reports.module");
 const common_module_1 = require("./common/common.module");
+const health_module_1 = require("./health/health.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -51,6 +52,7 @@ exports.AppModule = AppModule = __decorate([
             schedule_1.ScheduleModule.forRoot(),
             database_module_1.DatabaseModule,
             common_module_1.CommonModule,
+            health_module_1.HealthModule,
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             companies_module_1.CompaniesModule,

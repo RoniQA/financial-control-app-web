@@ -15,7 +15,7 @@ async function bootstrap() {
         transform: true,
     }));
     app.enableCors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: process.env.FRONTEND_URL || '*',
         credentials: true,
     });
     const config = new swagger_1.DocumentBuilder()
@@ -26,7 +26,7 @@ async function bootstrap() {
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('api/docs', app, document);
-    const port = process.env.PORT || 3001;
+    const port = process.env.PORT || 3000;
     await app.listen(port);
     logger.log(`🚀 Application is running on: http://localhost:${port}`);
     logger.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
