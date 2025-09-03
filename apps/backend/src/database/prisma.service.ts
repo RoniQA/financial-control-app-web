@@ -4,13 +4,37 @@ import { PrismaClient } from '@prisma/client';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
-    // Log da DATABASE_URL para debug (sem mostrar a senha)
-    const databaseUrl = process.env.DATABASE_URL;
+    // Try multiple ways to get DATABASE_URL
+    let databaseUrl = process.env.DATABASE_URL;
+    
+    // If not found, try other common Railway environment variable names
+    if (!databaseUrl) {
+      databaseUrl = process.env.POSTGRES_URL || 
+                   process.env.POSTGRES_DATABASE_URL || 
+                   process.env.DATABASE_CONNECTION_STRING ||
+                   process.env.DB_URL;
+    }
+    
+    // Log all database-related environment variables
+    console.log('🔍 Database environment variables:');
+    Object.keys(process.env).forEach(key => {
+      if (key.includes('DATABASE') || key.includes('POSTGRES') || key.includes('DB')) {
+        const value = process.env[key];
+        if (value && value.includes('://')) {
+          const maskedValue = value.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
+          console.log(`  - ${key}:`, maskedValue);
+        } else {
+          console.log(`  - ${key}:`, value ? '***' : 'undefined');
+        }
+      }
+    });
+    
     if (databaseUrl) {
       const maskedUrl = databaseUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
-      console.log('🔗 DATABASE_URL:', maskedUrl);
+      console.log('🔗 Using DATABASE_URL:', maskedUrl);
     } else {
-      console.error('❌ DATABASE_URL not found in environment variables');
+      console.error('❌ No DATABASE_URL found in any environment variable');
+      console.error('❌ Available environment variables:', Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('POSTGRES') || k.includes('DB')));
     }
 
     super({
