@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { 
-  Settings as SettingsIcon, 
   Palette, 
   User, 
   Bell, 
-  Shield, 
   Database,
   Monitor,
   Moon,
