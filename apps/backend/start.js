@@ -11,6 +11,16 @@ try {
   
   console.log('📁 Current directory:', process.cwd());
   
+  // Log environment variables for debug
+  console.log('🔍 Environment check:');
+  console.log('  - NODE_ENV:', process.env.NODE_ENV);
+  console.log('  - PORT:', process.env.PORT);
+  console.log('  - DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  if (process.env.DATABASE_URL) {
+    const maskedUrl = process.env.DATABASE_URL.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
+    console.log('  - DATABASE_URL:', maskedUrl);
+  }
+  
   // Generate Prisma Client
   console.log('🔧 Generating Prisma Client...');
   execSync('npx prisma generate', { 
