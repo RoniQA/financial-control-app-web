@@ -22,6 +22,7 @@ import { ReportsModule } from './modules/reports/reports.module';
 
 // Common modules
 import { CommonModule } from './common/common.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { CommonModule } from './common/common.module';
 
     // Common
     CommonModule,
+    HealthModule,
 
     // Core modules
     AuthModule,
