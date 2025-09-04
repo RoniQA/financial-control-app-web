@@ -52,18 +52,37 @@ try {
   
   console.log('✅ Prisma Client generated successfully');
   
-  // Verify frontend build exists
-  console.log('🔍 Checking frontend build...');
+  // Build frontend
+  console.log('🔧 Building frontend...');
   const frontendPath = path.join(__dirname, '..', '..', 'apps', 'frontend');
   const distPath = path.join(frontendPath, 'dist');
   const fs = require('fs');
   
-  if (fs.existsSync(distPath)) {
-    const files = fs.readdirSync(distPath);
-    console.log('✅ Frontend build found:', files);
-  } else {
-    console.log('❌ Frontend build not found at:', distPath);
-    console.log('⚠️ Frontend should have been built by the main build process');
+  try {
+    // Install frontend dependencies
+    console.log('📦 Installing frontend dependencies...');
+    execSync('npm ci', { 
+      stdio: 'inherit',
+      cwd: frontendPath 
+    });
+    
+    // Build frontend
+    console.log('🔧 Building frontend...');
+    execSync('npm run build', { 
+      stdio: 'inherit',
+      cwd: frontendPath 
+    });
+    
+    // Verify build
+    if (fs.existsSync(distPath)) {
+      const files = fs.readdirSync(distPath);
+      console.log('✅ Frontend build completed:', files);
+    } else {
+      throw new Error('Frontend build failed - dist folder not found');
+    }
+  } catch (error) {
+    console.error('❌ Frontend build failed:', error.message);
+    console.log('⚠️ Continuing with backend only...');
   }
   
   // Run database migrations
