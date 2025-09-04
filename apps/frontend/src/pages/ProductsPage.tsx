@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '../stores/authStore'
 import { Plus, Search, Edit, Trash2, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react'
 import api from '../services/api'
 import { ProductFormModal } from '../components/ProductFormModal'
@@ -24,14 +25,27 @@ export function ProductsPage() {
     queryKey: ['products', search],
     queryFn: async () => {
       console.log('🔍 Fetching products with search:', search)
-      const response = await api.get('/products', {
-        params: { search }
+      const authState = useAuthStore.getState()
+      console.log('🔑 Auth State during fetch:', {
+        isAuthenticated: authState.isAuthenticated,
+        hasToken: !!authState.accessToken,
+        companyId: authState.user?.companyId
       })
-      console.log('📦 Products response:', response.data)
-      console.log('📦 Products response type:', typeof response.data)
-      console.log('📦 Products response isArray:', Array.isArray(response.data))
-      console.log('📦 Products response length:', response.data?.length)
-      return response.data
+      
+      try {
+        const response = await api.get('/products', {
+          params: { search }
+        })
+        console.log('📦 Products response:', response.data)
+        console.log('📦 Products response type:', typeof response.data)
+        console.log('📦 Products response isArray:', Array.isArray(response.data))
+        console.log('📦 Products response length:', response.data?.length)
+        return response.data
+      } catch (error) {
+        console.error('Error fetching products:', error)
+        console.error('Error response:', error.response?.data)
+        throw error
+      }
     },
     staleTime: 0, // Sempre considerar dados como stale
     gcTime: 0, // Não manter cache
@@ -143,12 +157,20 @@ export function ProductsPage() {
   const handleDebugTest = async () => {
     try {
       console.log('🔍 Testing debug endpoint...')
+      const authState = useAuthStore.getState()
+      console.log('🔑 Auth State:', {
+        isAuthenticated: authState.isAuthenticated,
+        user: authState.user,
+        hasToken: !!authState.accessToken
+      })
+      
       const response = await api.get('/products/test/debug')
       console.log('🔍 Debug response:', response.data)
-      toast.success(`Debug: ${response.data.productsCount} produtos encontrados`)
+      toast.success(`Debug: ${response.data.productsCount} produtos encontrados. CompanyId: ${response.data.companyId}`)
     } catch (error: any) {
       console.error('Debug test error:', error)
-      toast.error('Erro no teste de debug')
+      console.error('Error response:', error.response?.data)
+      toast.error(`Erro no teste de debug: ${error.response?.data?.message || error.message}`)
     }
   }
 
