@@ -204,7 +204,7 @@ export function OrderViewModal({ isOpen, onClose, order }: OrderViewModalProps) 
                  <div className="flex justify-between">
                    <span className="text-gray-600">Subtotal:</span>
                    <span className="font-medium">
-                     R$ {order.items?.reduce((sum: number, item: any) => sum + ((item.quantity * item.unitPrice) || 0), 0).toFixed(2) || '0.00'}
+                     R$ {(order.items && Array.isArray(order.items) ? order.items.reduce((sum: number, item: any) => sum + ((item.quantity * item.unitPrice) || 0), 0) : 0).toFixed(2)}
                    </span>
                  </div>
                  <div className="border-t pt-2">

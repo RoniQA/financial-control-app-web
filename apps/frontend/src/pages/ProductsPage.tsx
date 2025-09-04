@@ -181,7 +181,7 @@ export function ProductsPage() {
                     R$ {product.prices?.[0]?.salePrice?.toFixed(2) || '0.00'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {product.stocks?.reduce((sum: number, stock: any) => sum + stock.quantity, 0) || 0}
+                    {product.stocks && Array.isArray(product.stocks) ? product.stocks.reduce((sum: number, stock: any) => sum + stock.quantity, 0) : 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -262,7 +262,7 @@ export function ProductsPage() {
                   <strong>SKU:</strong> {stockMovementModal.product?.sku}
                 </p>
                 <p className="text-sm text-gray-600">
-                  <strong>Estoque Atual:</strong> {stockMovementModal.product?.stocks?.reduce((sum: number, stock: any) => sum + stock.quantity, 0) || 0} {stockMovementModal.product?.unit || 'UN'}
+                  <strong>Estoque Atual:</strong> {stockMovementModal.product?.stocks && Array.isArray(stockMovementModal.product.stocks) ? stockMovementModal.product.stocks.reduce((sum: number, stock: any) => sum + stock.quantity, 0) : 0} {stockMovementModal.product?.unit || 'UN'}
                 </p>
               </div>
 
