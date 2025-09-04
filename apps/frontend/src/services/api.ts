@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || '/api'
+const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'https://financial-control-app-web-production.up.railway.app/api'
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,13 +13,24 @@ export const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const { accessToken } = useAuthStore.getState()
+    const { accessToken, user } = useAuthStore.getState()
+    console.log('🔒 API Request:', {
+      url: config.url,
+      method: config.method,
+      hasToken: !!accessToken,
+      hasUser: !!user,
+      companyId: user?.companyId
+    })
+
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`
+    } else {
+      console.warn('⚠️ No access token available for request')
     }
     return config
   },
   (error) => {
+    console.error('❌ Request interceptor error:', error)
     return Promise.reject(error)
   }
 )
