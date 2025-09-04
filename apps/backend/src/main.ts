@@ -35,7 +35,15 @@ async function bootstrap() {
   // Note: must be registered before controllers handle requests
   // Disable ETag globally in Express adapter
   (app as any).set('etag', false);
+  
+  // Debug middleware to log all requests
+  app.use((req, res, next) => {
+    console.log(`🔍 Request: ${req.method} ${req.path}`);
+    next();
+  });
+  
   app.use('/api', (req, res, next) => {
+    console.log(`🔍 API Request: ${req.method} ${req.path}`);
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
@@ -70,16 +78,20 @@ async function bootstrap() {
   if (require('fs').existsSync(frontendPath)) {
     app.useStaticAssets(frontendPath);
     console.log('✅ Serving static files from:', frontendPath);
-  } else {
-    console.log('⚠️  Frontend files not found, running API-only mode');
-  }
-
-  // Add catch-all route for SPA routing (AFTER all API routes are registered)
-  if (require('fs').existsSync(frontendPath)) {
+    
+    // Add catch-all route for SPA routing (ONLY for non-API routes)
     app.use('*', (req, res) => {
+      // Only serve index.html for non-API routes
+      if (req.path.startsWith('/api')) {
+        // This should not happen as API routes should be handled above
+        res.status(404).json({ message: 'API endpoint not found', path: req.path });
+        return;
+      }
       // Serve index.html for all non-API routes (SPA)
       res.sendFile(join(frontendPath, 'index.html'));
     });
+  } else {
+    console.log('⚠️  Frontend files not found, running API-only mode');
   }
 
   const port = process.env.PORT || 3000;
