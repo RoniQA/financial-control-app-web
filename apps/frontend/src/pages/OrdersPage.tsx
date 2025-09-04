@@ -42,6 +42,8 @@ export function OrdersPage() {
 
   const handleSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['orders'] })
+    queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
+    queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
   }
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -55,6 +57,8 @@ export function OrdersPage() {
       })
       toast.success('Status atualizado com sucesso!')
       queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
     } catch (error: any) {
       console.error('Error changing status:', error)
       toast.error(error.response?.data?.message || 'Erro ao atualizar status')
@@ -77,6 +81,8 @@ export function OrdersPage() {
         await api.delete(`/orders/${order.id}`)
         toast.success('Pedido deletado com sucesso!')
         queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
+        queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
       } catch (error: any) {
         toast.error(error.response?.data?.message || 'Erro ao deletar pedido')
       }
