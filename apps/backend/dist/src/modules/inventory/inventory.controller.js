@@ -28,8 +28,8 @@ let InventoryController = class InventoryController {
     async getStockMoves(productId, warehouseId) {
         return this.inventoryService.getStockMoves(productId, warehouseId);
     }
-    async getStockSummary() {
-        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    async getStockSummary(req) {
+        const companyId = req.user.companyId;
         return this.inventoryService.getStockSummary(companyId);
     }
 };
@@ -57,8 +57,9 @@ __decorate([
     (0, common_1.Get)('summary'),
     (0, swagger_1.ApiOperation)({ summary: 'Resumo do estoque' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Resumo do estoque' }),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "getStockSummary", null);
 exports.InventoryController = InventoryController = __decorate([

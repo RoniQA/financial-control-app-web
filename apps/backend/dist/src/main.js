@@ -5,6 +5,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const app_module_1 = require("./app.module");
 const common_2 = require("@nestjs/common");
+const path_1 = require("path");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const logger = new common_2.Logger('Bootstrap');
@@ -34,25 +35,16 @@ async function bootstrap() {
             environment: process.env.NODE_ENV || 'development'
         });
     });
+    app.useStaticAssets((0, path_1.join)(__dirname, '../frontend'));
     app.use('*', (req, res) => {
-        if (req.originalUrl.startsWith('/api')) {
+        if (req.originalUrl.startsWith('/api/')) {
             return res.status(404).json({
                 message: 'API endpoint not found',
                 error: 'Not Found',
                 statusCode: 404
             });
         }
-        res.status(200).json({
-            message: 'Gestus API is running successfully!',
-            status: 'api-only',
-            timestamp: new Date().toISOString(),
-            environment: process.env.NODE_ENV || 'development',
-            endpoints: {
-                health: '/health',
-                api: '/api',
-                docs: '/api/docs'
-            }
-        });
+        res.sendFile((0, path_1.join)(__dirname, '../frontend/index.html'));
     });
     const port = process.env.PORT || 3000;
     await app.listen(port);

@@ -4,7 +4,7 @@ import { UpdatePartnerDto } from './dto/update-partner.dto';
 export declare class PartnersController {
     private readonly partnersService;
     constructor(partnersService: PartnersService);
-    create(createPartnerDto: CreatePartnerDto): Promise<{
+    create(createPartnerDto: CreatePartnerDto, req: any): Promise<{
         id: string;
         name: string;
         ie: string | null;
@@ -20,7 +20,7 @@ export declare class PartnersController {
         document: string;
         im: string | null;
     }>;
-    findAll(filters: any): Promise<{
+    findAll(filters: any, req: any): Promise<{
         id: string;
         name: string;
         ie: string | null;

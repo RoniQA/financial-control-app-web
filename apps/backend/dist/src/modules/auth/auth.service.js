@@ -74,11 +74,62 @@ let AuthService = class AuthService {
             throw new common_1.BadRequestException('Email já está em uso');
         }
         const hashedPassword = await bcrypt.hash(registerDto.password, 12);
+        const company = await this.prisma.company.create({
+            data: {
+                name: `${registerDto.firstName} ${registerDto.lastName} - Empresa`,
+                cnpj: '00000000000000',
+                ie: '000000000',
+                email: registerDto.email,
+                phone: registerDto.phone || '(11) 99999-9999',
+                address: {
+                    street: '',
+                    number: '',
+                    neighborhood: '',
+                    city: '',
+                    state: '',
+                    zipCode: ''
+                }
+            }
+        });
+        await this.prisma.warehouse.create({
+            data: {
+                name: 'Estoque Principal',
+                code: 'MAIN',
+                companyId: company.id,
+                address: {
+                    street: '',
+                    number: '',
+                    neighborhood: '',
+                    city: '',
+                    state: '',
+                    zipCode: ''
+                }
+            }
+        });
+        let adminRole = await this.prisma.role.findFirst({
+            where: { name: 'admin' }
+        });
+        if (!adminRole) {
+            adminRole = await this.prisma.role.create({
+                data: {
+                    name: 'admin',
+                    description: 'Administrador do sistema',
+                    permissions: ['*']
+                }
+            });
+        }
         const user = await this.prisma.user.create({
             data: {
                 ...registerDto,
                 password: hashedPassword,
+                companyId: company.id,
             },
+        });
+        await this.prisma.userRole.create({
+            data: {
+                userId: user.id,
+                roleId: adminRole.id
+            }
         });
         const { password: _, ...result } = user;
         return result;

@@ -4,5 +4,5 @@ export declare class RegisterDto {
     firstName: string;
     lastName: string;
     phone?: string;
-    companyId: string;
+    companyId?: string;
 }

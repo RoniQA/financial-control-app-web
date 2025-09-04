@@ -49,23 +49,30 @@ async function bootstrap() {
     });
   });
 
-  // Serve static files from frontend build
-  app.useStaticAssets(join(__dirname, '../frontend'));
-  
-  // Serve index.html for all non-API routes (SPA routing)
-  app.use('*', (req, res) => {
-    // Skip API routes
-    if (req.originalUrl.startsWith('/api/')) {
-      return res.status(404).json({
-        message: 'API endpoint not found',
-        error: 'Not Found',
-        statusCode: 404
-      });
-    }
+  // Serve static files from frontend build (only if files exist)
+  const frontendPath = join(__dirname, '../frontend');
+  if (require('fs').existsSync(frontendPath)) {
+    app.useStaticAssets(frontendPath);
+    console.log('✅ Serving static files from:', frontendPath);
     
-    // Serve index.html for all other routes (SPA)
-    res.sendFile(join(__dirname, '../frontend/index.html'));
-  });
+    // Serve index.html for all non-API routes (SPA routing)
+    // This must be the LAST route defined
+    app.use('*', (req, res) => {
+      // Skip API routes - let them be handled by the API controllers
+      if (req.originalUrl.startsWith('/api/')) {
+        return res.status(404).json({
+          message: 'API endpoint not found',
+          error: 'Not Found',
+          statusCode: 404
+        });
+      }
+      
+      // Serve index.html for all other routes (SPA)
+      res.sendFile(join(frontendPath, 'index.html'));
+    });
+  } else {
+    console.log('⚠️  Frontend files not found, running API-only mode');
+  }
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

@@ -99,7 +99,7 @@ export declare class InventoryController {
         referenceId: string | null;
         reason: string | null;
     })[]>;
-    getStockSummary(): Promise<({
+    getStockSummary(req: any): Promise<({
         warehouse: {
             id: string;
             name: string;
