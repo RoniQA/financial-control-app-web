@@ -107,6 +107,23 @@ export class AuthService {
       }
     });
 
+    // Criar warehouse padrão para a empresa
+    await this.prisma.warehouse.create({
+      data: {
+        name: 'Estoque Principal',
+        code: 'MAIN',
+        companyId: company.id,
+        address: {
+          street: '',
+          number: '',
+          neighborhood: '',
+          city: '',
+          state: '',
+          zipCode: ''
+        }
+      }
+    });
+
     // Criar role de admin se não existir
     let adminRole = await this.prisma.role.findFirst({
       where: { name: 'admin' }

@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { X, Save } from 'lucide-react'
 import api from '../services/api'
 import { toast } from 'react-hot-toast'
+import { useAuthStore } from '../stores/authStore'
 
 const partnerSchema = z.object({
   name: z.string().min(1, 'Nome é obrigatório'),
@@ -37,6 +38,7 @@ interface PartnerFormModalProps {
 
 export function PartnerFormModal({ isOpen, onClose, onSuccess, partner }: PartnerFormModalProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { user } = useAuthStore()
 
   const {
     register,
@@ -78,7 +80,7 @@ export function PartnerFormModal({ isOpen, onClose, onSuccess, partner }: Partne
         phone: data.phone || null,
         address: data.address,
         isActive: data.isActive,
-        companyId: 'cmf1uv2gc0000z0axy1xdrony', // Nova Agro company ID
+        companyId: user?.companyId,
       }
 
       if (partner) {

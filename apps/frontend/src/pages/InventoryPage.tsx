@@ -3,6 +3,7 @@ import { Package, TrendingUp, TrendingDown, Plus, Minus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import api from '../services/api'
+import { useDefaultWarehouse } from '../hooks/useDefaultWarehouse'
 
 export function InventoryPage() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null)
@@ -11,6 +12,7 @@ export function InventoryPage() {
   const [movementReason, setMovementReason] = useState<string>('')
   const [selectedProductForMovement, setSelectedProductForMovement] = useState<string>('')
   const [filter, setFilter] = useState<'all' | 'low-stock' | 'in-stock'>('all')
+  const { data: defaultWarehouse } = useDefaultWarehouse()
 
   const { data: stockSummary, isLoading, refetch } = useQuery({
     queryKey: ['inventory-summary'],
@@ -42,7 +44,7 @@ export function InventoryPage() {
 
   const handleStockMovement = async () => {
     const productId = selectedProduct?.product?.id || selectedProductForMovement
-    const warehouseId = selectedProduct?.warehouse?.id || 'cmf1uv2n8000az0axienbav97' // Estoque Principal
+    const warehouseId = selectedProduct?.warehouse?.id || defaultWarehouse?.id
 
     if (!productId || movementQuantity <= 0) {
       toast.error('Selecione um produto e informe uma quantidade válida')
