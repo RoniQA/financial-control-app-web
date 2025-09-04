@@ -19,6 +19,8 @@ interface AuthState {
   updateTokens: (accessToken: string, refreshToken: string) => void
 }
 
+const storageKey = 'auth-storage-v1';
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -34,15 +36,25 @@ export const useAuthStore = create<AuthState>()(
           hasAccessToken: !!accessToken,
           hasRefreshToken: !!refreshToken 
         });
-        set({
+
+        const state = {
           user,
           accessToken,
           refreshToken,
           isAuthenticated: true,
-        });
+        };
+
+        // Salvar explicitamente no localStorage também
+        localStorage.setItem(storageKey, JSON.stringify({
+          state,
+          version: 0
+        }));
+
+        set(state);
       },
       logout: () => {
         console.log('🔓 Logout called');
+        localStorage.removeItem(storageKey);
         set({
           user: null,
           accessToken: null,
@@ -52,18 +64,37 @@ export const useAuthStore = create<AuthState>()(
       },
       updateTokens: (accessToken, refreshToken) => {
         console.log('🔄 Updating tokens');
-        set({ accessToken, refreshToken });
+        const currentState = useAuthStore.getState();
+        const newState = { 
+          ...currentState, 
+          accessToken, 
+          refreshToken 
+        };
+        
+        // Atualizar localStorage
+        localStorage.setItem(storageKey, JSON.stringify({
+          state: newState,
+          version: 0
+        }));
+        
+        set(newState);
       },
     }),
     {
-      name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-        accessToken: state.accessToken,
-        refreshToken: state.refreshToken,
-        isAuthenticated: state.isAuthenticated,
-      })
+      name: storageKey,
+      skipHydration: true, // Vamos gerenciar a hidratação manualmente
     }
   )
-)
+);
+
+// Hidratar o estado inicial do localStorage
+const savedAuth = localStorage.getItem(storageKey);
+if (savedAuth) {
+  try {
+    const { state } = JSON.parse(savedAuth);
+    useAuthStore.setState(state);
+  } catch (error) {
+    console.error('Failed to hydrate auth state:', error);
+  }
+}
 
