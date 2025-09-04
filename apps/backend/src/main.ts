@@ -49,59 +49,28 @@ async function bootstrap() {
     });
   });
 
-  // Serve static files from frontend build
-  const frontendPath = join(__dirname, '..', '..', '..', 'apps', 'frontend', 'dist');
-  console.log('📁 Frontend path:', frontendPath);
-  
-  // Check if frontend build exists
-  const fs = require('fs');
-  if (fs.existsSync(frontendPath)) {
-    console.log('✅ Frontend build found, serving static files');
-    app.useStaticAssets(frontendPath);
-    
-    // Serve frontend for all non-API routes (must be last)
-    app.use('*', (req, res) => {
-      // If it's an API route, let it pass through
-      if (req.originalUrl.startsWith('/api')) {
-        return res.status(404).json({
-          message: 'API endpoint not found',
-          error: 'Not Found',
-          statusCode: 404
-        });
-      }
-      
-      // Serve index.html for all other routes (SPA routing)
-      const indexPath = join(frontendPath, 'index.html');
-      if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-      } else {
-        res.status(404).json({
-          message: 'Frontend not found',
-          error: 'Not Found',
-          statusCode: 404
-        });
-      }
-    });
-  } else {
-    console.log('❌ Frontend build not found at:', frontendPath);
-    // Fallback for when frontend is not built
-    app.use('*', (req, res) => {
-      if (req.originalUrl.startsWith('/api')) {
-        return res.status(404).json({
-          message: 'API endpoint not found',
-          error: 'Not Found',
-          statusCode: 404
-        });
-      }
-      
-      res.status(200).json({
-        message: 'Backend is running, but frontend is not built yet',
-        status: 'backend-only',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development'
+  // Simple API-only response for non-API routes
+  app.use('*', (req, res) => {
+    if (req.originalUrl.startsWith('/api')) {
+      return res.status(404).json({
+        message: 'API endpoint not found',
+        error: 'Not Found',
+        statusCode: 404
       });
+    }
+    
+    res.status(200).json({
+      message: 'Gestus API is running successfully!',
+      status: 'api-only',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      endpoints: {
+        health: '/health',
+        api: '/api',
+        docs: '/api/docs'
+      }
     });
-  }
+  });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
