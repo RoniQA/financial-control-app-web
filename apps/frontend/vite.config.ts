@@ -14,7 +14,9 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://financial-control-app-web-production.up.railway.app',
+        target: process.env.NODE_ENV === 'production' 
+          ? 'https://financial-control-app-web-production.up.railway.app'
+          : 'http://localhost:3001',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'),

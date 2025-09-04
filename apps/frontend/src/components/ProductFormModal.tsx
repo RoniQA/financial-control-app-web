@@ -149,10 +149,6 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
         (productData as any).sku = finalSku
       }
 
-      console.log('=== SENDING PRODUCT DATA ===')
-      console.log('Product Data:', productData)
-      console.log('User Company ID:', user?.companyId)
-      console.log('Default Warehouse:', defaultWarehouse)
 
       if (product) {
         // Update existing product

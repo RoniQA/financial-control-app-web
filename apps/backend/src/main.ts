@@ -49,22 +49,22 @@ async function bootstrap() {
     });
   });
 
-  // Simple API-only response for non-API routes (only for root path)
-  app.use('/', (req, res, next) => {
-    if (req.originalUrl === '/' || req.originalUrl === '') {
-      return res.status(200).json({
-        message: 'Gestus API is running successfully!',
-        status: 'api-only',
-        timestamp: new Date().toISOString(),
-        environment: process.env.NODE_ENV || 'development',
-        endpoints: {
-          health: '/health',
-          api: '/api',
-          docs: '/api/docs'
-        }
+  // Serve static files from frontend build
+  app.useStaticAssets(join(__dirname, '../frontend'));
+  
+  // Serve index.html for all non-API routes (SPA routing)
+  app.use('*', (req, res) => {
+    // Skip API routes
+    if (req.originalUrl.startsWith('/api/')) {
+      return res.status(404).json({
+        message: 'API endpoint not found',
+        error: 'Not Found',
+        statusCode: 404
       });
     }
-    next();
+    
+    // Serve index.html for all other routes (SPA)
+    res.sendFile(join(__dirname, '../frontend/index.html'));
   });
 
   const port = process.env.PORT || 3000;

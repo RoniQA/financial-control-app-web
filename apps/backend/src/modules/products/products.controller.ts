@@ -19,7 +19,6 @@ export class ProductsController {
   async create(@Body() createProductDto: CreateProductDto, @Request() req: any) {
     // Override companyId with the one from JWT token
     createProductDto.companyId = req.user.companyId;
-    console.log('Creating product with data:', createProductDto);
     return this.productsService.create(createProductDto);
   }
 
@@ -28,7 +27,6 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Lista de produtos' })
   async findAll(@Query() filters: any, @Request() req: any) {
     const companyId = req.user.companyId;
-    console.log('Finding products for companyId:', companyId);
     return this.productsService.findAll(companyId, filters);
   }
 
