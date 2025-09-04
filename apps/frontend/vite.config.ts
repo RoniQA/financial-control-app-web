@@ -33,6 +33,6 @@ export default defineConfig({
       },
     },
   },
-  base: '/',
+  base: process.env.NODE_ENV === 'production' ? '/' : '/',
 })
 

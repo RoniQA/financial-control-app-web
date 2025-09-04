@@ -11,15 +11,29 @@ import api from '../services/api'
 import { SalesPurchaseCharts } from '../components/SalesPurchaseCharts'
 
 export function DashboardPage() {
-  const { data: dashboardData, isLoading } = useQuery({
+  const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ['dashboard'],
     queryFn: () => api.get('/reports/dashboard').then(res => res.data),
+    retry: 1,
   })
+
+  console.log('DashboardPage - isLoading:', isLoading, 'error:', error, 'data:', dashboardData)
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Erro ao carregar dashboard</h2>
+          <p className="text-gray-600">{error.message}</p>
+        </div>
       </div>
     )
   }

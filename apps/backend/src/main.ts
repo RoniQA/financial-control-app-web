@@ -24,7 +24,9 @@ async function bootstrap() {
 
   // CORS configuration
   app.enableCors({
-    origin: process.env.FRONTEND_URL || '*',
+    origin: process.env.NODE_ENV === 'production' 
+      ? ['https://financial-control-app-web-production.up.railway.app', 'https://*.up.railway.app']
+      : ['http://localhost:3000', 'http://localhost:3001'],
     credentials: true,
   });
 
