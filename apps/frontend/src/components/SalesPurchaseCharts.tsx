@@ -74,16 +74,20 @@ export function SalesPurchaseCharts() {
     const purchasesByDay: { [key: string]: number } = {}
 
     // Process sales data
-    salesData?.forEach((order: any) => {
-      const date = new Date(order.createdAt).toISOString().split('T')[0]
-      salesByDay[date] = (salesByDay[date] || 0) + (order.total || 0)
-    })
+    if (salesData && Array.isArray(salesData)) {
+      salesData.forEach((order: any) => {
+        const date = new Date(order.createdAt).toISOString().split('T')[0]
+        salesByDay[date] = (salesByDay[date] || 0) + (order.total || 0)
+      })
+    }
 
     // Process purchases data
-    purchasesData?.forEach((order: any) => {
-      const date = new Date(order.createdAt).toISOString().split('T')[0]
-      purchasesByDay[date] = (purchasesByDay[date] || 0) + (order.total || 0)
-    })
+    if (purchasesData && Array.isArray(purchasesData)) {
+      purchasesData.forEach((order: any) => {
+        const date = new Date(order.createdAt).toISOString().split('T')[0]
+        purchasesByDay[date] = (purchasesByDay[date] || 0) + (order.total || 0)
+      })
+    }
 
     // Create date range
     const start = new Date(startDate)

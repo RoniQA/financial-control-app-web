@@ -131,7 +131,7 @@ export function DashboardPage() {
         <div className="space-y-4">
           <h2 className="text-xl font-semibold text-secondary-900 dark:text-dark-text">Alertas Importantes</h2>
           <div className="grid gap-4">
-            {alerts.map((alert, index) => (
+            {alerts && Array.isArray(alerts) && alerts.map((alert, index) => (
               <div
                 key={index}
                 className={`p-6 rounded-2xl border-l-4 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] ${
@@ -255,7 +255,7 @@ export function DashboardPage() {
           <div className="p-6">
             {recentOrders?.length > 0 ? (
               <div className="space-y-4">
-                {recentOrders.map((order: any) => (
+                {recentOrders && Array.isArray(recentOrders) && recentOrders.map((order: any) => (
                   <div key={order.id} className="group flex items-center justify-between p-4 bg-gradient-to-r from-secondary-50 to-white rounded-xl border border-white/20 hover:shadow-medium transition-all duration-200 hover:scale-[1.02]">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -302,7 +302,7 @@ export function DashboardPage() {
           <div className="p-6">
             {lowStockProducts?.length > 0 ? (
               <div className="space-y-4">
-                {lowStockProducts.map((stock: any) => (
+                {lowStockProducts && Array.isArray(lowStockProducts) && lowStockProducts.map((stock: any) => (
                   <div key={stock.id} className="group flex items-center justify-between p-4 bg-gradient-to-r from-warning-50 to-warning-100/30 rounded-xl border border-warning-200 hover:shadow-medium transition-all duration-200 hover:scale-[1.02]">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-warning-100 rounded-lg flex items-center justify-center">
