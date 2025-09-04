@@ -49,27 +49,22 @@ async function bootstrap() {
     });
   });
 
-  // Simple API-only response for non-API routes
-  app.use('*', (req, res) => {
-    if (req.originalUrl.startsWith('/api')) {
-      return res.status(404).json({
-        message: 'API endpoint not found',
-        error: 'Not Found',
-        statusCode: 404
+  // Simple API-only response for non-API routes (only for root path)
+  app.use('/', (req, res, next) => {
+    if (req.originalUrl === '/' || req.originalUrl === '') {
+      return res.status(200).json({
+        message: 'Gestus API is running successfully!',
+        status: 'api-only',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        endpoints: {
+          health: '/health',
+          api: '/api',
+          docs: '/api/docs'
+        }
       });
     }
-    
-    res.status(200).json({
-      message: 'Gestus API is running successfully!',
-      status: 'api-only',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      endpoints: {
-        health: '/health',
-        api: '/api',
-        docs: '/api/docs'
-      }
-    });
+    next();
   });
 
   const port = process.env.PORT || 3000;

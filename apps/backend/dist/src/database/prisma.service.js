@@ -14,12 +14,46 @@ const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
 let PrismaService = class PrismaService extends client_1.PrismaClient {
     constructor() {
+        let databaseUrl = process.env.DATABASE_URL;
+        if (!databaseUrl) {
+            databaseUrl = process.env.POSTGRES_URL ||
+                process.env.POSTGRES_DATABASE_URL ||
+                process.env.DATABASE_CONNECTION_STRING ||
+                process.env.DB_URL;
+        }
+        console.log('🔍 Database environment variables:');
+        Object.keys(process.env).forEach(key => {
+            if (key.includes('DATABASE') || key.includes('POSTGRES') || key.includes('DB')) {
+                const value = process.env[key];
+                if (value && value.includes('://')) {
+                    const maskedValue = value.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
+                    console.log(`  - ${key}:`, maskedValue);
+                }
+                else {
+                    console.log(`  - ${key}:`, value ? '***' : 'undefined');
+                }
+            }
+        });
+        if (databaseUrl) {
+            const maskedUrl = databaseUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
+            console.log('🔗 Using DATABASE_URL:', maskedUrl);
+        }
+        else {
+            console.error('❌ No DATABASE_URL found in any environment variable');
+            console.error('❌ Available environment variables:', Object.keys(process.env).filter(k => k.includes('DATABASE') || k.includes('POSTGRES') || k.includes('DB')));
+        }
         super({
             log: ['query', 'info', 'warn', 'error'],
+            datasources: {
+                db: {
+                    url: databaseUrl,
+                },
+            },
         });
     }
     async onModuleInit() {
         try {
+            console.log('🔄 Attempting to connect to database...');
             await this.$connect();
             console.log('✅ Prisma Client connected successfully');
         }
