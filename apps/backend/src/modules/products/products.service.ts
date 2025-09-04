@@ -8,6 +8,8 @@ export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createProductDto: CreateProductDto) {
+    console.log('🔍 ProductsService.create - createProductDto:', JSON.stringify(createProductDto, null, 2));
+    
     // Check if SKU already exists for this company
     const existingProduct = await this.prisma.product.findUnique({
       where: {
@@ -19,10 +21,12 @@ export class ProductsService {
     });
 
     if (existingProduct) {
+      console.log('❌ SKU already exists:', createProductDto.sku);
       throw new Error(`SKU '${createProductDto.sku}' já existe para esta empresa`);
     }
 
-    return this.prisma.product.create({
+    console.log('✅ Creating product with data:', createProductDto);
+    const result = await this.prisma.product.create({
       data: createProductDto,
       include: {
         prices: true,
@@ -33,6 +37,9 @@ export class ProductsService {
         },
       },
     });
+    
+    console.log('✅ Product created successfully:', JSON.stringify(result, null, 2));
+    return result;
   }
 
   async findAll(companyId: string, filters?: any) {
