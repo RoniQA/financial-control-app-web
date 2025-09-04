@@ -30,6 +30,20 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // Disable ETag and caching for API responses to avoid 304 and stale data
+  // This ensures lists reflect mutations immediately in production
+  // Note: must be registered before controllers handle requests
+  // Disable ETag globally in Express adapter
+  (app as any).set('etag', false);
+  app.use('/api', (req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    res.removeHeader('ETag');
+    next();
+  });
+
   // Swagger documentation
   const config = new DocumentBuilder()
     .setTitle('Nova Agro API')
