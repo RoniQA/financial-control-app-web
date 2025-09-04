@@ -75,9 +75,9 @@ export function FinancialPage() {
               >
                 <Icon className="h-4 w-4 mr-2" />
                 {tab.name}
-                {tab.id === 'notifications' && notifications?.filter((n: any) => n.status === 'PENDING').length > 0 && (
+                {tab.id === 'notifications' && notifications && Array.isArray(notifications) && notifications.filter((n: any) => n.status === 'PENDING').length > 0 && (
                   <span className="ml-2 bg-orange-100 text-orange-800 text-xs font-medium px-2 py-0.5 rounded-full">
-                    {notifications.filter((n: any) => n.status === 'PENDING').length}
+                    {notifications && Array.isArray(notifications) ? notifications.filter((n: any) => n.status === 'PENDING').length : 0}
                   </span>
                 )}
               </button>
@@ -168,16 +168,16 @@ export function FinancialPage() {
                 <h2 className="text-lg font-semibold text-gray-900">
                   Notificações Financeiras
                 </h2>
-                {notifications?.filter((n: any) => n.status === 'PENDING').length > 0 && (
+                {notifications && Array.isArray(notifications) && notifications.filter((n: any) => n.status === 'PENDING').length > 0 && (
                   <span className="ml-2 bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                    {notifications.filter((n: any) => n.status === 'PENDING').length}
+                    {notifications && Array.isArray(notifications) ? notifications.filter((n: any) => n.status === 'PENDING').length : 0}
                   </span>
                 )}
               </div>
             </div>
 
             <div className="p-6">
-              {notifications?.filter((n: any) => n.status === 'PENDING').length === 0 ? (
+              {!notifications || !Array.isArray(notifications) || notifications.filter((n: any) => n.status === 'PENDING').length === 0 ? (
                 <div className="text-center py-12">
                   <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">Nenhuma notificação financeira pendente</p>
