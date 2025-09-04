@@ -21,7 +21,7 @@ export function PartnersPage() {
       return response.data
     },
     staleTime: 0, // Sempre considerar dados como stale
-    cacheTime: 0, // Não manter cache
+    gcTime: 0, // Não manter cache
   })
 
   const handleCreatePartner = () => {
@@ -140,7 +140,7 @@ export function PartnersPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {partners && Array.isArray(partners) && partners.map((partner: any) => (
+              {partners && Array.isArray(partners) ? partners.map((partner: any) => (
                 <tr key={partner.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {partner.name}
@@ -192,13 +192,13 @@ export function PartnersPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : null}
             </tbody>
           </table>
         </div>
       </div>
 
-      {partners?.length === 0 && (
+      {partners && Array.isArray(partners) && partners.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">Nenhum parceiro encontrado</p>
         </div>

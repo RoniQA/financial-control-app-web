@@ -29,7 +29,7 @@ export function ProductsPage() {
       return response.data
     },
     staleTime: 0, // Sempre considerar dados como stale
-    cacheTime: 0, // Não manter cache
+    gcTime: 0, // Não manter cache
   })
 
   const handleCreateProduct = () => {
@@ -177,7 +177,7 @@ export function ProductsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products && Array.isArray(products) && products.map((product: any) => (
+              {products && Array.isArray(products) ? products.map((product: any) => (
                 <tr key={product.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {product.sku}
@@ -236,13 +236,13 @@ export function ProductsPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : null}
             </tbody>
           </table>
         </div>
       </div>
 
-      {products?.length === 0 && (
+      {products && Array.isArray(products) && products.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">Nenhum produto encontrado</p>
         </div>

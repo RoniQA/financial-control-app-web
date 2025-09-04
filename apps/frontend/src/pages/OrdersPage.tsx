@@ -24,7 +24,7 @@ export function OrdersPage() {
       return response.data
     },
     staleTime: 0, // Sempre considerar dados como stale
-    cacheTime: 0, // Não manter cache
+    gcTime: 0, // Não manter cache
   })
 
   const handleCreateOrder = () => {
@@ -175,7 +175,7 @@ export function OrdersPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {orders && Array.isArray(orders) && orders.map((order: any) => (
+              {orders && Array.isArray(orders) ? orders.map((order: any) => (
                 <tr key={order.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {order.number}
@@ -256,13 +256,13 @@ export function OrdersPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )) : null}
             </tbody>
           </table>
         </div>
       </div>
 
-      {orders?.length === 0 && (
+      {orders && Array.isArray(orders) && orders.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">Nenhum pedido encontrado</p>
         </div>
