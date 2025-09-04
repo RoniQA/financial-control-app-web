@@ -20,6 +20,8 @@ export function PartnersPage() {
       })
       return response.data
     },
+    staleTime: 0, // Sempre considerar dados como stale
+    cacheTime: 0, // Não manter cache
   })
 
   const handleCreatePartner = () => {
@@ -41,6 +43,7 @@ export function PartnersPage() {
     queryClient.invalidateQueries({ queryKey: ['partners'] })
     queryClient.invalidateQueries({ queryKey: ['orders'] })
     queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
+    queryClient.refetchQueries({ queryKey: ['partners'] })
   }
 
   const handleDeletePartner = async (partner: any) => {

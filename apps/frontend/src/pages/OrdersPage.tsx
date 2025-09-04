@@ -23,6 +23,8 @@ export function OrdersPage() {
       })
       return response.data
     },
+    staleTime: 0, // Sempre considerar dados como stale
+    cacheTime: 0, // Não manter cache
   })
 
   const handleCreateOrder = () => {
@@ -44,6 +46,7 @@ export function OrdersPage() {
     queryClient.invalidateQueries({ queryKey: ['orders'] })
     queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
     queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
+    queryClient.refetchQueries({ queryKey: ['orders'] })
   }
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
