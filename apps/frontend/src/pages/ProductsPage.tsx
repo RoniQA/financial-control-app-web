@@ -158,18 +158,30 @@ export function ProductsPage() {
     try {
       console.log('🔍 Testing debug endpoint...')
       const authState = useAuthStore.getState()
-      console.log('🔑 Auth State:', {
+      console.log('🔑 Full Auth State:', authState)
+      console.log('🔑 Auth Details:', {
         isAuthenticated: authState.isAuthenticated,
-        user: authState.user,
-        hasToken: !!authState.accessToken
+        userId: authState.user?.id,
+        userEmail: authState.user?.email,
+        companyId: authState.user?.companyId,
+        hasAccessToken: !!authState.accessToken,
+        hasRefreshToken: !!authState.refreshToken
       })
+      
+      // Verificar cabeçalhos da requisição
+      const headers = api.defaults.headers;
+      console.log('🔍 API Headers:', headers);
       
       const response = await api.get('/products/test/debug')
       console.log('🔍 Debug response:', response.data)
+      console.log('🔍 Response headers:', response.headers)
+      
       toast.success(`Debug: ${response.data.productsCount} produtos encontrados. CompanyId: ${response.data.companyId}`)
     } catch (error: any) {
-      console.error('Debug test error:', error)
-      console.error('Error response:', error.response?.data)
+      console.error('🔥 Debug test error:', error)
+      console.error('🔥 Error response:', error.response?.data)
+      console.error('🔥 Error status:', error.response?.status)
+      console.error('🔥 Error headers:', error.response?.headers)
       toast.error(`Erro no teste de debug: ${error.response?.data?.message || error.message}`)
     }
   }
