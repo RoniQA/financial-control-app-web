@@ -19,25 +19,49 @@ export const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const { accessToken, user } = useAuthStore.getState()
+    // Tentar obter o token do localStorage primeiro
+    let authData;
+    try {
+      const stored = localStorage.getItem('auth-storage-v1');
+      if (stored) {
+        authData = JSON.parse(stored).state;
+      }
+    } catch (error) {
+      console.error('❌ Error reading from localStorage:', error);
+    }
+
+    // Se não encontrou no localStorage, tenta do estado do Zustand
+    if (!authData) {
+      authData = useAuthStore.getState();
+    }
+
+    const { accessToken, user } = authData || {};
+
     console.log('🔒 API Request:', {
       url: config.url,
       method: config.method,
       hasToken: !!accessToken,
       hasUser: !!user,
-      companyId: user?.companyId
-    })
+      companyId: user?.companyId,
+      headers: config.headers
+    });
 
     if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`
+      config.headers.Authorization = `Bearer ${accessToken}`;
+      console.log('✅ Token added to request:', `Bearer ${accessToken.substring(0, 10)}...`);
     } else {
-      console.warn('⚠️ No access token available for request')
+      console.warn('⚠️ No access token available for request');
+      // Se não tem token e não é rota de login/registro, redireciona para login
+      if (!config.url?.includes('/auth/login') && !config.url?.includes('/auth/register')) {
+        window.location.href = '/login';
+      }
     }
-    return config
+
+    return config;
   },
   (error) => {
-    console.error('❌ Request interceptor error:', error)
-    return Promise.reject(error)
+    console.error('❌ Request interceptor error:', error);
+    return Promise.reject(error);
   }
 )
 

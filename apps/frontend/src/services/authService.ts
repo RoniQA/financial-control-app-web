@@ -27,8 +27,21 @@ export interface RegisterRequest {
 
 export const authService = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    const response = await api.post('/auth/login', data)
-    return response.data
+    console.log('🔐 Calling login API with:', { email: data.email });
+    const response = await api.post('/auth/login', data);
+    console.log('🔐 Login API response:', {
+      status: response.status,
+      hasData: !!response.data,
+      hasUser: !!response.data?.user,
+      hasToken: !!response.data?.accessToken
+    });
+    
+    // Validar a resposta
+    if (!response.data?.user || !response.data?.accessToken) {
+      throw new Error('Resposta da API incompleta');
+    }
+    
+    return response.data;
   },
 
   register: async (data: RegisterRequest) => {
