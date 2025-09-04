@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { authService } from '../services/authService'
 
@@ -46,7 +46,7 @@ export function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Nova Agro
+            Gestus
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Sistema de Gestão Financeira e Estoque
@@ -98,10 +98,10 @@ export function LoginPage() {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Usuário de teste: admin@novaagro.com
-            </p>
-            <p className="text-sm text-gray-600">
-              Senha: admin123
+              Não tem uma conta?{' '}
+              <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                Cadastre-se aqui
+              </Link>
             </p>
           </div>
         </form>
