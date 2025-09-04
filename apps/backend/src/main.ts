@@ -73,21 +73,28 @@ async function bootstrap() {
     });
   });
 
-  // Serve static files from frontend build (only if files exist)
+  // IMPORTANT: Register static files and catch-all routes AFTER all API routes
+  // This ensures API routes are processed before static file serving
   const frontendPath = join(__dirname, '../frontend');
   if (require('fs').existsSync(frontendPath)) {
+    console.log('✅ Frontend files found, registering static routes...');
+    
+    // Serve static files from frontend build
     app.useStaticAssets(frontendPath);
     console.log('✅ Serving static files from:', frontendPath);
     
     // Add catch-all route for SPA routing (ONLY for non-API routes)
     app.use('*', (req, res) => {
+      console.log(`🔍 Catch-all route triggered for: ${req.method} ${req.path}`);
       // Only serve index.html for non-API routes
       if (req.path.startsWith('/api')) {
         // This should not happen as API routes should be handled above
+        console.log(`❌ API route not found: ${req.path}`);
         res.status(404).json({ message: 'API endpoint not found', path: req.path });
         return;
       }
       // Serve index.html for all non-API routes (SPA)
+      console.log(`📄 Serving index.html for: ${req.path}`);
       res.sendFile(join(frontendPath, 'index.html'));
     });
   } else {
