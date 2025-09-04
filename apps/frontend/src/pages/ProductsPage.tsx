@@ -28,6 +28,8 @@ export function ProductsPage() {
       })
       return response.data
     },
+    staleTime: 0, // Sempre considerar dados como stale
+    cacheTime: 0, // Não manter cache
   })
 
   const handleCreateProduct = () => {
@@ -46,9 +48,12 @@ export function ProductsPage() {
   }
 
   const handleSuccess = () => {
+    console.log('🔄 Invalidating queries after product creation/update...')
     queryClient.invalidateQueries({ queryKey: ['products'] })
     queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
     queryClient.invalidateQueries({ queryKey: ['default-warehouse'] })
+    queryClient.refetchQueries({ queryKey: ['products'] })
+    console.log('✅ Queries invalidated and refetched')
   }
 
   const handleDeleteProduct = async (product: any) => {
