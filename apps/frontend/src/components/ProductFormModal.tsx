@@ -164,7 +164,7 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
         }
         
         // Update stock if quantity changed
-        const currentStock = product.stocks?.reduce((sum: number, stock: any) => sum + stock.quantity, 0) || 0
+        const currentStock = (product.stocks && Array.isArray(product.stocks) ? product.stocks : []).reduce((sum: number, stock: any) => sum + stock.quantity, 0)
         const stockDifference = data.initialQuantity - currentStock
         
         if (stockDifference !== 0 && defaultWarehouse) {

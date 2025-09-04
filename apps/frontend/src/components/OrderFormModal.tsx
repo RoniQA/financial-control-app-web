@@ -164,7 +164,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
   }
 
   const calculateTotal = () => {
-    return orderItems.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
+    return (orderItems && Array.isArray(orderItems) ? orderItems : []).reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0)
   }
 
   const onSubmit = async (data: OrderFormData) => {

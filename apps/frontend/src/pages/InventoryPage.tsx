@@ -130,7 +130,7 @@ export function InventoryPage() {
                     Total em Estoque
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
-                    {stockSummary?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0}
+                    {stockSummary && Array.isArray(stockSummary) ? stockSummary.reduce((sum: number, item: any) => sum + item.quantity, 0) : 0}
                   </dd>
                 </dl>
               </div>

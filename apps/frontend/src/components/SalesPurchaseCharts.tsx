@@ -154,8 +154,8 @@ export function SalesPurchaseCharts() {
     ],
   }
 
-  const totalSales = chartData.salesData.reduce((sum, value) => sum + value, 0)
-  const totalPurchases = chartData.purchaseData.reduce((sum, value) => sum + value, 0)
+  const totalSales = (chartData.salesData && Array.isArray(chartData.salesData) ? chartData.salesData : []).reduce((sum, value) => sum + value, 0)
+  const totalPurchases = (chartData.purchaseData && Array.isArray(chartData.purchaseData) ? chartData.purchaseData : []).reduce((sum, value) => sum + value, 0)
   const netResult = totalSales - totalPurchases
 
   if (salesLoading || purchasesLoading) {
