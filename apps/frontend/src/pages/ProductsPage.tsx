@@ -20,17 +20,21 @@ export function ProductsPage() {
   const queryClient = useQueryClient()
   const { data: defaultWarehouse } = useDefaultWarehouse()
 
-  const { data: products, isLoading } = useQuery({
+  const { data: products, isLoading, error } = useQuery({
     queryKey: ['products', search],
     queryFn: async () => {
+      console.log('🔍 Fetching products with search:', search)
       const response = await api.get('/products', {
         params: { search }
       })
+      console.log('📦 Products response:', response.data)
       return response.data
     },
     staleTime: 0, // Sempre considerar dados como stale
     gcTime: 0, // Não manter cache
   })
+
+  console.log('📊 Products state:', { products, isLoading, error })
 
   const handleCreateProduct = () => {
     setEditingProduct(null)
@@ -49,11 +53,17 @@ export function ProductsPage() {
 
   const handleSuccess = () => {
     console.log('🔄 Invalidating queries after product creation/update...')
+    console.log('Current products before invalidation:', products)
+    
     queryClient.invalidateQueries({ queryKey: ['products'] })
     queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
     queryClient.invalidateQueries({ queryKey: ['default-warehouse'] })
-    queryClient.refetchQueries({ queryKey: ['products'] })
-    console.log('✅ Queries invalidated and refetched')
+    
+    // Force refetch with a small delay to ensure backend has processed the data
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['products'] })
+      console.log('✅ Queries invalidated and refetched after delay')
+    }, 500)
   }
 
   const handleDeleteProduct = async (product: any) => {

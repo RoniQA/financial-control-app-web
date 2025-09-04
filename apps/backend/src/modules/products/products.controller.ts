@@ -27,7 +27,10 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Lista de produtos' })
   async findAll(@Query() filters: any, @Request() req: any) {
     const companyId = req.user.companyId;
-    return this.productsService.findAll(companyId, filters);
+    console.log('🔍 ProductsController.findAll - companyId:', companyId, 'filters:', filters);
+    const result = await this.productsService.findAll(companyId, filters);
+    console.log('📦 ProductsController.findAll - result count:', result?.length || 0);
+    return result;
   }
 
   @Get(':id')
