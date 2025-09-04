@@ -22,7 +22,7 @@ export function ReportsPage() {
           const value = row[header] || ''
           return `"${String(value).replace(/"/g, '""')}"`
         }).join(',')
-      )
+      ) : [])
     ].join('\n')
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
