@@ -16,7 +16,10 @@ import { ReportsPage } from './pages/ReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
 
 function App() {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
+
+  // Debug logs
+  console.log('App render - isAuthenticated:', isAuthenticated, 'user:', user)
 
   if (!isAuthenticated) {
     return (
