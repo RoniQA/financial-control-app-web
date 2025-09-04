@@ -152,6 +152,18 @@ export function ProductsPage() {
     }
   }
 
+  const handleSimpleTest = async () => {
+    try {
+      console.log('🔍 Testing simple endpoint...')
+      const response = await api.get('/products/test/simple')
+      console.log('🔍 Simple response:', response.data)
+      toast.success(`Simple test: ${response.data.message}`)
+    } catch (error: any) {
+      console.error('Simple test error:', error)
+      toast.error('Erro no teste simples')
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -168,6 +180,13 @@ export function ProductsPage() {
           <p className="text-gray-600">Gerencie seu catálogo de produtos</p>
         </div>
         <div className="flex space-x-2">
+          <button 
+            onClick={handleSimpleTest}
+            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center"
+            title="Testar conexão simples"
+          >
+            Teste Simples
+          </button>
           <button 
             onClick={handleDebugTest}
             className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center"

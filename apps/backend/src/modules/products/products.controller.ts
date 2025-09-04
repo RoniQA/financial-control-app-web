@@ -86,22 +86,54 @@ export class ProductsController {
     return this.productsService.getStock(productId, warehouseId);
   }
 
+  @Get('test/simple')
+  @ApiOperation({ summary: 'Simple test endpoint without auth' })
+  @ApiResponse({ status: 200, description: 'Simple test response' })
+  async simpleTest() {
+    console.log('🔍 Simple test endpoint called');
+    return {
+      message: 'Simple test endpoint working',
+      timestamp: new Date().toISOString(),
+      path: '/api/products/test/simple'
+    };
+  }
+
   @Get('test/debug')
   @ApiOperation({ summary: 'Debug endpoint to test data flow' })
   @ApiResponse({ status: 200, description: 'Debug information' })
   async debug(@Request() req: any) {
-    const companyId = req.user.companyId;
+    console.log('🔍 Debug endpoint called - path: /api/products/test/debug');
+    console.log('🔍 Debug endpoint - req.user:', req.user);
+    
+    const companyId = req.user?.companyId;
     console.log('🔍 Debug endpoint - companyId:', companyId);
     
-    const products = await this.productsService.findAll(companyId, {});
-    console.log('🔍 Debug endpoint - products count:', products?.length || 0);
+    if (!companyId) {
+      return {
+        error: 'No companyId found in request',
+        user: req.user,
+        timestamp: new Date().toISOString()
+      };
+    }
     
-    return {
-      companyId,
-      productsCount: products?.length || 0,
-      products: products || [],
-      timestamp: new Date().toISOString()
-    };
+    try {
+      const products = await this.productsService.findAll(companyId, {});
+      console.log('🔍 Debug endpoint - products count:', products?.length || 0);
+      
+      return {
+        companyId,
+        productsCount: products?.length || 0,
+        products: products || [],
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('🔍 Debug endpoint - error:', error);
+      return {
+        error: error.message,
+        companyId,
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 }
 
