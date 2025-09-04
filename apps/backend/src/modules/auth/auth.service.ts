@@ -19,20 +19,30 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
+    console.log('🔍 Validating user:', { email });
     const user = await this.usersService.findByEmail(email);
+    console.log('🔍 User found:', { 
+      found: !!user, 
+      isActive: user?.isActive,
+      hasCompanyId: !!user?.companyId
+    });
     
     if (!user || !user.isActive) {
+      console.log('❌ User not found or inactive');
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
     // Check if user is locked
     if (user.lockedUntil && user.lockedUntil > new Date()) {
+      console.log('❌ User is locked until:', user.lockedUntil);
       throw new UnauthorizedException('Usuário bloqueado temporariamente');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log('🔑 Password validation:', { isValid: isPasswordValid });
     
     if (!isPasswordValid) {
+      console.log('❌ Invalid password');
       // Increment failed login attempts
       await this.incrementFailedLogins(user.id);
       throw new UnauthorizedException('Credenciais inválidas');
@@ -52,21 +62,33 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
+    console.log('🔐 Login attempt:', { email: loginDto.email });
+    
     const user = await this.validateUser(loginDto.email, loginDto.password);
+    console.log('✅ User validated:', { 
+      id: user.id,
+      email: user.email,
+      companyId: user.companyId 
+    });
     
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
       companyId: user.companyId,
     };
+    console.log('🔑 JWT payload:', payload);
 
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN', '7d'),
     });
+    console.log('🎟️ Tokens generated:', { 
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken 
+    });
 
-    return {
+    const response = {
       accessToken,
       refreshToken,
       user: {
@@ -77,6 +99,19 @@ export class AuthService {
         companyId: user.companyId,
       },
     };
+    
+    console.log('📤 Login response:', {
+      hasUser: !!response.user,
+      hasAccessToken: !!response.accessToken,
+      hasRefreshToken: !!response.refreshToken,
+      userDetails: {
+        id: response.user.id,
+        email: response.user.email,
+        companyId: response.user.companyId
+      }
+    });
+
+    return response;
   }
 
   async register(registerDto: RegisterDto) {

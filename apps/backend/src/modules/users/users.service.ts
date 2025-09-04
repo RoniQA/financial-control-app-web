@@ -59,7 +59,8 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return this.prisma.user.findUnique({
+    console.log('🔍 Finding user by email:', email);
+    const user = await this.prisma.user.findUnique({
       where: { email },
       include: {
         company: true,
@@ -70,6 +71,15 @@ export class UsersService {
         },
       },
     });
+
+    console.log('🔍 User search result:', {
+      found: !!user,
+      hasCompany: !!user?.company,
+      companyId: user?.companyId,
+      roles: user?.roles?.length || 0
+    });
+
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
