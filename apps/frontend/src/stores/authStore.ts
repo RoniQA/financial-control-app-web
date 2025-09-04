@@ -27,7 +27,13 @@ export const useAuthStore = create<AuthState>()(
       refreshToken: null,
       isAuthenticated: false,
       login: (user, accessToken, refreshToken) => {
-        console.log('🔐 Login called with:', { user, hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
+        console.log('🔐 Login called with:', { 
+          userId: user?.id,
+          userEmail: user?.email,
+          companyId: user?.companyId,
+          hasAccessToken: !!accessToken,
+          hasRefreshToken: !!refreshToken 
+        });
         set({
           user,
           accessToken,
@@ -45,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
         });
       },
       updateTokens: (accessToken, refreshToken) => {
-        console.log('🔄 Update tokens called:', { hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
+        console.log('🔄 Updating tokens');
         set({ accessToken, refreshToken });
       },
     }),
@@ -56,22 +62,7 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
-      }),
-      storage: {
-        getItem: (name) => {
-          const str = localStorage.getItem(name);
-          console.log('🔍 Getting from storage:', name, str ? JSON.parse(str) : null);
-          return str;
-        },
-        setItem: (name, value) => {
-          console.log('💾 Setting in storage:', name, value);
-          localStorage.setItem(name, value);
-        },
-        removeItem: (name) => {
-          console.log('🗑️ Removing from storage:', name);
-          localStorage.removeItem(name);
-        },
-      },
+      })
     }
   )
 )
