@@ -67,10 +67,10 @@ export declare class FinancialService {
             isActive: boolean;
             companyId: string;
             type: string;
+            balance: number;
             bank: string;
             agency: string;
             account: string;
-            balance: number;
         };
     } & {
         id: string;
@@ -154,10 +154,10 @@ export declare class FinancialService {
             isActive: boolean;
             companyId: string;
             type: string;
+            balance: number;
             bank: string;
             agency: string;
             account: string;
-            balance: number;
         };
     } & {
         id: string;
@@ -241,10 +241,10 @@ export declare class FinancialService {
             isActive: boolean;
             companyId: string;
             type: string;
+            balance: number;
             bank: string;
             agency: string;
             account: string;
-            balance: number;
         };
     } & {
         id: string;
@@ -328,10 +328,10 @@ export declare class FinancialService {
             isActive: boolean;
             companyId: string;
             type: string;
+            balance: number;
             bank: string;
             agency: string;
             account: string;
-            balance: number;
         };
     } & {
         id: string;
