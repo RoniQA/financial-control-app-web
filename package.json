@@ -18,7 +18,7 @@
     "build:backend": "cd apps/backend && npm run build",
     "build:frontend": "cd apps/frontend && npm run build",
     "start": "npm run start:backend",
-    "start:prod": "cd apps/backend && npm run start:prod",
+    "start:prod": "npm run build && cd apps/backend && npm run start:prod",
     "preview": "cd apps/frontend && npm run preview",
     "test": "npm run test:backend && npm run test:frontend",
     "test:backend": "cd apps/backend && npm run test",
