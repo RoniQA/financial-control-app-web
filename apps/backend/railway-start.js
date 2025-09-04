@@ -52,6 +52,15 @@ try {
   
   console.log('✅ Prisma Client generated successfully');
   
+  // Build frontend
+  console.log('🔧 Building frontend...');
+  execSync('cd ../../apps/frontend && npm run build', { 
+    stdio: 'inherit',
+    cwd: __dirname 
+  });
+  
+  console.log('✅ Frontend built successfully');
+  
   // Run database migrations
   console.log('🔄 Running database migrations...');
   try {
