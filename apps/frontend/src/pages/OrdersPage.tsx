@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, Edit, Eye, Trash2 } from 'lucide-react'
+import { Plus, Search, Edit, Eye, Trash2, RefreshCw } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import api from '../services/api'
 import { OrderFormModal } from '../components/OrderFormModal'
@@ -15,17 +15,30 @@ export function OrdersPage() {
   const [viewingOrder, setViewingOrder] = useState(null)
   const queryClient = useQueryClient()
 
-  const { data: orders, isLoading } = useQuery({
+  const { data: orders, isLoading, refetch } = useQuery({
     queryKey: ['orders', search, statusFilter],
     queryFn: async () => {
+      console.log('🔍 Fetching orders with search:', search, 'status:', statusFilter)
       const response = await api.get('/orders', {
         params: { search, status: statusFilter }
       })
+      console.log('📦 Orders response:', response.data)
+      console.log('📦 Orders response type:', typeof response.data)
+      console.log('📦 Orders response isArray:', Array.isArray(response.data))
+      console.log('📦 Orders response length:', response.data?.length)
       return response.data
     },
     staleTime: 0, // Sempre considerar dados como stale
     gcTime: 0, // Não manter cache
+    refetchOnWindowFocus: true, // Refetch when window gains focus
+    refetchOnMount: true, // Always refetch on mount
+    retry: 3, // Retry failed requests
   })
+
+  console.log('📊 Orders state:', { orders, isLoading })
+  console.log('📊 Orders data type:', typeof orders)
+  console.log('📊 Orders isArray:', Array.isArray(orders))
+  console.log('📊 Orders length:', orders?.length)
 
   const handleCreateOrder = () => {
     setEditingOrder(null)
@@ -43,10 +56,29 @@ export function OrdersPage() {
   }
 
   const handleSuccess = () => {
+    console.log('🔄 Invalidating queries after order creation/update...')
+    console.log('Current orders before invalidation:', orders)
+    
+    // Clear all caches related to orders
+    queryClient.removeQueries({ queryKey: ['orders'] })
     queryClient.invalidateQueries({ queryKey: ['orders'] })
     queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
     queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
-    queryClient.refetchQueries({ queryKey: ['orders'] })
+    
+    // Force immediate refetch
+    refetch()
+    
+    // Force refetch with a small delay to ensure backend has processed the data
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['orders'] })
+      console.log('✅ Queries invalidated and refetched after delay')
+    }, 500)
+    
+    // Additional refetch after a longer delay as backup
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['orders'] })
+      console.log('✅ Backup refetch completed')
+    }, 2000)
   }
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -107,13 +139,23 @@ export function OrdersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Pedidos</h1>
           <p className="text-gray-600">Gerencie pedidos de compra e venda</p>
         </div>
-        <button 
-          onClick={handleCreateOrder}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Pedido
-        </button>
+        <div className="flex space-x-2">
+          <button 
+            onClick={() => refetch()}
+            className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 flex items-center"
+            title="Atualizar lista"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Atualizar
+          </button>
+          <button 
+            onClick={handleCreateOrder}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Pedido
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

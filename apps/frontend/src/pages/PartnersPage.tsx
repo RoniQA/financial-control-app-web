@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, Edit, Trash2 } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, RefreshCw } from 'lucide-react'
 import api from '../services/api'
 import { PartnerFormModal } from '../components/PartnerFormModal'
 import { toast } from 'react-hot-toast'
@@ -12,17 +12,30 @@ export function PartnersPage() {
   const [editingPartner, setEditingPartner] = useState(null)
   const queryClient = useQueryClient()
 
-  const { data: partners, isLoading } = useQuery({
+  const { data: partners, isLoading, refetch } = useQuery({
     queryKey: ['partners', search, typeFilter],
     queryFn: async () => {
+      console.log('🔍 Fetching partners with search:', search, 'type:', typeFilter)
       const response = await api.get('/partners', {
         params: { search, type: typeFilter }
       })
+      console.log('📦 Partners response:', response.data)
+      console.log('📦 Partners response type:', typeof response.data)
+      console.log('📦 Partners response isArray:', Array.isArray(response.data))
+      console.log('📦 Partners response length:', response.data?.length)
       return response.data
     },
     staleTime: 0, // Sempre considerar dados como stale
     gcTime: 0, // Não manter cache
+    refetchOnWindowFocus: true, // Refetch when window gains focus
+    refetchOnMount: true, // Always refetch on mount
+    retry: 3, // Retry failed requests
   })
+
+  console.log('📊 Partners state:', { partners, isLoading })
+  console.log('📊 Partners data type:', typeof partners)
+  console.log('📊 Partners isArray:', Array.isArray(partners))
+  console.log('📊 Partners length:', partners?.length)
 
   const handleCreatePartner = () => {
     setEditingPartner(null)
@@ -40,10 +53,29 @@ export function PartnersPage() {
   }
 
   const handleSuccess = () => {
+    console.log('🔄 Invalidating queries after partner creation/update...')
+    console.log('Current partners before invalidation:', partners)
+    
+    // Clear all caches related to partners
+    queryClient.removeQueries({ queryKey: ['partners'] })
     queryClient.invalidateQueries({ queryKey: ['partners'] })
     queryClient.invalidateQueries({ queryKey: ['orders'] })
     queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
-    queryClient.refetchQueries({ queryKey: ['partners'] })
+    
+    // Force immediate refetch
+    refetch()
+    
+    // Force refetch with a small delay to ensure backend has processed the data
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['partners'] })
+      console.log('✅ Queries invalidated and refetched after delay')
+    }, 500)
+    
+    // Additional refetch after a longer delay as backup
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['partners'] })
+      console.log('✅ Backup refetch completed')
+    }, 2000)
   }
 
   const handleDeletePartner = async (partner: any) => {
@@ -75,13 +107,23 @@ export function PartnersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Parceiros</h1>
           <p className="text-gray-600">Gerencie clientes e fornecedores</p>
         </div>
-        <button 
-          onClick={handleCreatePartner}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Parceiro
-        </button>
+        <div className="flex space-x-2">
+          <button 
+            onClick={() => refetch()}
+            className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 flex items-center"
+            title="Atualizar lista"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Atualizar
+          </button>
+          <button 
+            onClick={handleCreatePartner}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Parceiro
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, Edit, Trash2, TrendingUp, TrendingDown } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react'
 import api from '../services/api'
 import { ProductFormModal } from '../components/ProductFormModal'
 import { toast } from 'react-hot-toast'
@@ -20,7 +20,7 @@ export function ProductsPage() {
   const queryClient = useQueryClient()
   const { data: defaultWarehouse } = useDefaultWarehouse()
 
-  const { data: products, isLoading, error } = useQuery({
+  const { data: products, isLoading, error, refetch } = useQuery({
     queryKey: ['products', search],
     queryFn: async () => {
       console.log('🔍 Fetching products with search:', search)
@@ -28,13 +28,22 @@ export function ProductsPage() {
         params: { search }
       })
       console.log('📦 Products response:', response.data)
+      console.log('📦 Products response type:', typeof response.data)
+      console.log('📦 Products response isArray:', Array.isArray(response.data))
+      console.log('📦 Products response length:', response.data?.length)
       return response.data
     },
     staleTime: 0, // Sempre considerar dados como stale
     gcTime: 0, // Não manter cache
+    refetchOnWindowFocus: true, // Refetch when window gains focus
+    refetchOnMount: true, // Always refetch on mount
+    retry: 3, // Retry failed requests
   })
 
   console.log('📊 Products state:', { products, isLoading, error })
+  console.log('📊 Products data type:', typeof products)
+  console.log('📊 Products isArray:', Array.isArray(products))
+  console.log('📊 Products length:', products?.length)
 
   const handleCreateProduct = () => {
     setEditingProduct(null)
@@ -55,15 +64,27 @@ export function ProductsPage() {
     console.log('🔄 Invalidating queries after product creation/update...')
     console.log('Current products before invalidation:', products)
     
+    // Clear all caches related to products
+    queryClient.removeQueries({ queryKey: ['products'] })
     queryClient.invalidateQueries({ queryKey: ['products'] })
     queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
     queryClient.invalidateQueries({ queryKey: ['default-warehouse'] })
+    queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
+    
+    // Force immediate refetch
+    refetch()
     
     // Force refetch with a small delay to ensure backend has processed the data
     setTimeout(() => {
       queryClient.refetchQueries({ queryKey: ['products'] })
       console.log('✅ Queries invalidated and refetched after delay')
     }, 500)
+    
+    // Additional refetch after a longer delay as backup
+    setTimeout(() => {
+      queryClient.refetchQueries({ queryKey: ['products'] })
+      console.log('✅ Backup refetch completed')
+    }, 2000)
   }
 
   const handleDeleteProduct = async (product: any) => {
@@ -119,6 +140,18 @@ export function ProductsPage() {
     setMovementReason('')
   }
 
+  const handleDebugTest = async () => {
+    try {
+      console.log('🔍 Testing debug endpoint...')
+      const response = await api.get('/products/test/debug')
+      console.log('🔍 Debug response:', response.data)
+      toast.success(`Debug: ${response.data.productsCount} produtos encontrados`)
+    } catch (error: any) {
+      console.error('Debug test error:', error)
+      toast.error('Erro no teste de debug')
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -134,14 +167,62 @@ export function ProductsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Produtos</h1>
           <p className="text-gray-600">Gerencie seu catálogo de produtos</p>
         </div>
-        <button 
-          onClick={handleCreateProduct}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Produto
-        </button>
+        <div className="flex space-x-2">
+          <button 
+            onClick={handleDebugTest}
+            className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center"
+            title="Testar debug"
+          >
+            Debug
+          </button>
+          <button 
+            onClick={() => refetch()}
+            className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 flex items-center"
+            title="Atualizar lista"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Atualizar
+          </button>
+          <button 
+            onClick={handleCreateProduct}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Novo Produto
+          </button>
+        </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-red-800 mb-2">Erro ao carregar produtos</h3>
+          <div className="text-sm text-red-700">
+            {error.message || 'Erro desconhecido'}
+          </div>
+          <button 
+            onClick={() => refetch()}
+            className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {/* Debug Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="text-sm font-medium text-yellow-800 mb-2">Debug Info</h3>
+          <div className="text-xs text-yellow-700 space-y-1">
+            <div>Products type: {typeof products}</div>
+            <div>Products isArray: {Array.isArray(products) ? 'true' : 'false'}</div>
+            <div>Products length: {products?.length || 0}</div>
+            <div>IsLoading: {isLoading ? 'true' : 'false'}</div>
+            <div>Error: {error ? 'true' : 'false'}</div>
+            {error && <div>Error message: {error.message}</div>}
+          </div>
+        </div>
+      )}
 
       {/* Search */}
       <div className="bg-white shadow rounded-lg p-4">
@@ -187,7 +268,7 @@ export function ProductsPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products && Array.isArray(products) ? products.map((product: any) => (
+              {products && Array.isArray(products) && products.length > 0 ? products.map((product: any) => (
                 <tr key={product.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {product.sku}
@@ -246,17 +327,17 @@ export function ProductsPage() {
                     </div>
                   </td>
                 </tr>
-              )) : null}
+              )) : (
+                <tr>
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    {isLoading ? 'Carregando...' : 'Nenhum produto encontrado'}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
-
-      {products && Array.isArray(products) && products.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Nenhum produto encontrado</p>
-        </div>
-      )}
 
       {/* Modal */}
       <ProductFormModal

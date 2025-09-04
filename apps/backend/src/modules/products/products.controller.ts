@@ -17,9 +17,17 @@ export class ProductsController {
   @ApiOperation({ summary: 'Criar novo produto' })
   @ApiResponse({ status: 201, description: 'Produto criado com sucesso' })
   async create(@Body() createProductDto: CreateProductDto, @Request() req: any) {
+    console.log('🔍 ProductsController.create - Original DTO:', JSON.stringify(createProductDto, null, 2));
+    console.log('🔍 ProductsController.create - User from JWT:', JSON.stringify(req.user, null, 2));
+    
     // Override companyId with the one from JWT token
     createProductDto.companyId = req.user.companyId;
-    return this.productsService.create(createProductDto);
+    
+    console.log('🔍 ProductsController.create - Modified DTO:', JSON.stringify(createProductDto, null, 2));
+    
+    const result = await this.productsService.create(createProductDto);
+    console.log('✅ ProductsController.create - Result:', JSON.stringify(result, null, 2));
+    return result;
   }
 
   @Get()
@@ -76,6 +84,24 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Estoque do produto' })
   async getStock(@Param('id') productId: string, @Query('warehouseId') warehouseId?: string) {
     return this.productsService.getStock(productId, warehouseId);
+  }
+
+  @Get('test/debug')
+  @ApiOperation({ summary: 'Debug endpoint to test data flow' })
+  @ApiResponse({ status: 200, description: 'Debug information' })
+  async debug(@Request() req: any) {
+    const companyId = req.user.companyId;
+    console.log('🔍 Debug endpoint - companyId:', companyId);
+    
+    const products = await this.productsService.findAll(companyId, {});
+    console.log('🔍 Debug endpoint - products count:', products?.length || 0);
+    
+    return {
+      companyId,
+      productsCount: products?.length || 0,
+      products: products || [],
+      timestamp: new Date().toISOString()
+    };
   }
 }
 
