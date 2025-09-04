@@ -36,6 +36,8 @@ export class ProductsService {
   }
 
   async findAll(companyId: string, filters?: any) {
+    console.log('🔍 ProductsService.findAll - companyId:', companyId, 'filters:', filters);
+    
     const where: any = {
       companyId,
       deletedAt: null,
@@ -57,7 +59,9 @@ export class ProductsService {
       where.isActive = filters.isActive;
     }
 
-    return this.prisma.product.findMany({
+    console.log('🔍 ProductsService.findAll - where clause:', JSON.stringify(where, null, 2));
+
+    const result = await this.prisma.product.findMany({
       where,
       include: {
         prices: {
@@ -72,6 +76,9 @@ export class ProductsService {
       },
       orderBy: { name: 'asc' },
     });
+
+    console.log('📦 ProductsService.findAll - found products:', result.length);
+    return result;
   }
 
   async findById(id: string) {
