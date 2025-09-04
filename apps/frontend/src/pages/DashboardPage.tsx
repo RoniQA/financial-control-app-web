@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import React from 'react'
 import { 
   Package, 
   Users, 
@@ -11,13 +11,30 @@ import api from '../services/api'
 import { SalesPurchaseCharts } from '../components/SalesPurchaseCharts'
 
 export function DashboardPage() {
-  const { data: dashboardData, isLoading, error } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => api.get('/reports/dashboard').then(res => res.data),
-    retry: 1,
-  })
+  console.log('DashboardPage rendering...')
 
-  console.log('DashboardPage - isLoading:', isLoading, 'error:', error, 'data:', dashboardData)
+  // Simplified version without complex queries
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+  const [dashboardData, setDashboardData] = React.useState<any>(null)
+
+  React.useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        console.log('Loading dashboard data...')
+        const response = await api.get('/reports/dashboard')
+        console.log('Dashboard data loaded:', response.data)
+        setDashboardData(response.data)
+      } catch (err: any) {
+        console.error('Error loading dashboard:', err)
+        setError(err.message || 'Erro ao carregar dados')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadDashboard()
+  }, [])
 
   if (isLoading) {
     return (
@@ -32,7 +49,13 @@ export function DashboardPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-red-600 mb-2">Erro ao carregar dashboard</h2>
-          <p className="text-gray-600">{error.message}</p>
+          <p className="text-gray-600">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Recarregar
+          </button>
         </div>
       </div>
     )
