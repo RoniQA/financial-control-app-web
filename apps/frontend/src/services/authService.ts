@@ -23,7 +23,6 @@ export interface RegisterRequest {
   firstName: string
   lastName: string
   phone?: string
-  companyId: string
 }
 
 export const authService = {
