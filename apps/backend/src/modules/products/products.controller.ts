@@ -90,7 +90,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'Simple test endpoint without auth' })
   @ApiResponse({ status: 200, description: 'Simple test response' })
   async simpleTest() {
-    console.log('🔍 Simple test endpoint called');
+    console.log('🔍 Simple test endpoint called - path: /api/products/test/simple');
     return {
       message: 'Simple test endpoint working',
       timestamp: new Date().toISOString(),
