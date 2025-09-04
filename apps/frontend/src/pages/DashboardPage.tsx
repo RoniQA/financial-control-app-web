@@ -7,11 +7,13 @@ import {
   AlertTriangle, 
   CheckCircle
 } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import api from '../services/api'
 import { SalesPurchaseCharts } from '../components/SalesPurchaseCharts'
 
 export function DashboardPage() {
   console.log('DashboardPage rendering...')
+  const queryClient = useQueryClient()
 
   // Simplified version without complex queries
   const [isLoading, setIsLoading] = React.useState(true)

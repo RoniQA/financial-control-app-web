@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Package, TrendingUp, TrendingDown, Plus, Minus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
@@ -13,6 +13,7 @@ export function InventoryPage() {
   const [selectedProductForMovement, setSelectedProductForMovement] = useState<string>('')
   const [filter, setFilter] = useState<'all' | 'low-stock' | 'in-stock'>('all')
   const { data: defaultWarehouse } = useDefaultWarehouse()
+  const queryClient = useQueryClient()
 
   const { data: stockSummary, isLoading, refetch } = useQuery({
     queryKey: ['inventory-summary'],
@@ -66,6 +67,9 @@ export function InventoryPage() {
       setMovementQuantity(0)
       setMovementReason('')
       refetch()
+      queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Erro ao realizar movimentação')
     }

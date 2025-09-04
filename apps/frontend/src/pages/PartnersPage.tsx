@@ -39,6 +39,8 @@ export function PartnersPage() {
 
   const handleSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['partners'] })
+    queryClient.invalidateQueries({ queryKey: ['orders'] })
+    queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
   }
 
   const handleDeletePartner = async (partner: any) => {
@@ -47,6 +49,8 @@ export function PartnersPage() {
         await api.delete(`/partners/${partner.id}`)
         toast.success('Parceiro deletado com sucesso!')
         queryClient.invalidateQueries({ queryKey: ['partners'] })
+        queryClient.invalidateQueries({ queryKey: ['orders'] })
+        queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
       } catch (error: any) {
         toast.error(error.response?.data?.message || 'Erro ao deletar parceiro')
       }

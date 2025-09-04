@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Plus, Search, TrendingUp, TrendingDown, DollarSign, AlertCircle, Check, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import api from '../services/api'
@@ -8,6 +8,7 @@ export function FinancialPage() {
   const [activeTab, setActiveTab] = useState('balance')
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
+  const queryClient = useQueryClient()
 
   const { data: payments, isLoading } = useQuery({
     queryKey: ['payments', search, typeFilter],

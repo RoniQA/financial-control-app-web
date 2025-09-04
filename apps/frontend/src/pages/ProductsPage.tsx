@@ -47,6 +47,8 @@ export function ProductsPage() {
 
   const handleSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['products'] })
+    queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
+    queryClient.invalidateQueries({ queryKey: ['default-warehouse'] })
   }
 
   const handleDeleteProduct = async (product: any) => {
@@ -55,6 +57,8 @@ export function ProductsPage() {
         await api.delete(`/products/${product.id}`)
         toast.success('Produto deletado com sucesso!')
         queryClient.invalidateQueries({ queryKey: ['products'] })
+        queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
+        queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
       } catch (error: any) {
         toast.error(error.response?.data?.message || 'Erro ao deletar produto')
       }
@@ -87,6 +91,8 @@ export function ProductsPage() {
       setMovementQuantity(0)
       setMovementReason('')
       queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Erro ao realizar movimentação')
     }
