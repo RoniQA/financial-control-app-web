@@ -18,6 +18,7 @@ const users_module_1 = require("./modules/users/users.module");
 const companies_module_1 = require("./modules/companies/companies.module");
 const products_module_1 = require("./modules/products/products.module");
 const inventory_module_1 = require("./modules/inventory/inventory.module");
+const warehouses_module_1 = require("./modules/warehouses/warehouses.module");
 const partners_module_1 = require("./modules/partners/partners.module");
 const orders_module_1 = require("./modules/orders/orders.module");
 const invoices_module_1 = require("./modules/invoices/invoices.module");
@@ -58,6 +59,7 @@ exports.AppModule = AppModule = __decorate([
             companies_module_1.CompaniesModule,
             products_module_1.ProductsModule,
             inventory_module_1.InventoryModule,
+            warehouses_module_1.WarehousesModule,
             partners_module_1.PartnersModule,
             orders_module_1.OrdersModule,
             invoices_module_1.InvoicesModule,

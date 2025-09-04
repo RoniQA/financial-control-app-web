@@ -23,11 +23,12 @@ let ProductsController = class ProductsController {
     constructor(productsService) {
         this.productsService = productsService;
     }
-    async create(createProductDto) {
+    async create(createProductDto, req) {
+        createProductDto.companyId = req.user.companyId;
         return this.productsService.create(createProductDto);
     }
-    async findAll(filters) {
-        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    async findAll(filters, req) {
+        const companyId = req.user.companyId;
         return this.productsService.findAll(companyId, filters);
     }
     async findOne(id) {
@@ -56,8 +57,9 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Criar novo produto' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Produto criado com sucesso' }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto]),
+    __metadata("design:paramtypes", [create_product_dto_1.CreateProductDto, Object]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "create", null);
 __decorate([
@@ -65,8 +67,9 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Listar produtos' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de produtos' }),
     __param(0, (0, common_1.Query)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ProductsController.prototype, "findAll", null);
 __decorate([

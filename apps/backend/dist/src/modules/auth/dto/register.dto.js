@@ -43,7 +43,8 @@ __decorate([
     __metadata("design:type", String)
 ], RegisterDto.prototype, "phone", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ example: 'company-id' }),
+    (0, swagger_1.ApiProperty)({ example: 'company-id', required: false }),
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "companyId", void 0);

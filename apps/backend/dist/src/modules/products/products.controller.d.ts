@@ -4,7 +4,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export declare class ProductsController {
     private readonly productsService;
     constructor(productsService: ProductsService);
-    create(createProductDto: CreateProductDto): Promise<{
+    create(createProductDto: CreateProductDto, req: any): Promise<{
         stocks: ({
             warehouse: {
                 id: string;
@@ -65,7 +65,7 @@ export declare class ProductsController {
         dimensions: import("@prisma/client/runtime/library").JsonValue | null;
         isService: boolean;
     }>;
-    findAll(filters: any): Promise<({
+    findAll(filters: any, req: any): Promise<({
         stocks: ({
             warehouse: {
                 id: string;

@@ -23,11 +23,12 @@ let PartnersController = class PartnersController {
     constructor(partnersService) {
         this.partnersService = partnersService;
     }
-    async create(createPartnerDto) {
+    async create(createPartnerDto, req) {
+        createPartnerDto.companyId = req.user.companyId;
         return this.partnersService.create(createPartnerDto);
     }
-    async findAll(filters) {
-        const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+    async findAll(filters, req) {
+        const companyId = req.user.companyId;
         return this.partnersService.findAll(companyId, filters);
     }
     async findOne(id) {
@@ -46,8 +47,9 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Criar novo parceiro' }),
     (0, swagger_1.ApiResponse)({ status: 201, description: 'Parceiro criado com sucesso' }),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_partner_dto_1.CreatePartnerDto]),
+    __metadata("design:paramtypes", [create_partner_dto_1.CreatePartnerDto, Object]),
     __metadata("design:returntype", Promise)
 ], PartnersController.prototype, "create", null);
 __decorate([
@@ -55,8 +57,9 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Listar parceiros' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'Lista de parceiros' }),
     __param(0, (0, common_1.Query)()),
+    __param(1, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PartnersController.prototype, "findAll", null);
 __decorate([
