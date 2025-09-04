@@ -130,16 +130,17 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
 
       const productData = {
         name: data.name,
-        description: data.description,
-        category: data.category,
-        brand: data.brand,
-        model: data.model,
+        description: data.description || undefined,
+        category: data.category || undefined,
+        brand: data.brand || undefined,
+        model: data.model || undefined,
         unit: data.unit,
-        ncm: data.ncm,
-        cest: data.cest,
-        weight: data.weight,
-        dimensions: data.dimensions,
+        ncm: data.ncm || undefined,
+        cest: data.cest || undefined,
+        weight: data.weight || undefined,
+        dimensions: data.dimensions || undefined,
         isActive: data.isActive,
+        isService: false, // Default to false for now
         companyId: user?.companyId,
       }
 
@@ -147,6 +148,11 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
       if (!product) {
         (productData as any).sku = finalSku
       }
+
+      console.log('=== SENDING PRODUCT DATA ===')
+      console.log('Product Data:', productData)
+      console.log('User Company ID:', user?.companyId)
+      console.log('Default Warehouse:', defaultWarehouse)
 
       if (product) {
         // Update existing product
