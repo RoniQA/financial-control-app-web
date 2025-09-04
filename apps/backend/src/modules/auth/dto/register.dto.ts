@@ -24,8 +24,9 @@ export class RegisterDto {
   @IsString()
   phone?: string;
 
-  @ApiProperty({ example: 'company-id' })
+  @ApiProperty({ example: 'company-id', required: false })
+  @IsOptional()
   @IsString()
-  companyId: string;
+  companyId?: string;
 }
 
