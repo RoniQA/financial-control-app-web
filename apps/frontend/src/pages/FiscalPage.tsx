@@ -103,7 +103,7 @@ export function FiscalPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {nfeDocuments?.map((nfe: any) => (
+                {nfeDocuments && Array.isArray(nfeDocuments) && nfeDocuments.map((nfe: any) => (
                   <tr key={nfe.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {nfe.number}

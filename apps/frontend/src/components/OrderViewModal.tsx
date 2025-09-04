@@ -170,7 +170,7 @@ export function OrderViewModal({ isOpen, onClose, order }: OrderViewModalProps) 
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {order.items.map((item: any, index: number) => (
+                      {order.items && Array.isArray(order.items) && order.items.map((item: any, index: number) => (
                         <tr key={index}>
                           <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-900">
                             {item.product?.name || 'Produto não encontrado'}
