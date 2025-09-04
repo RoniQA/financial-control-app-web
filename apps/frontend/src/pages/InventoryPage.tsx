@@ -229,7 +229,7 @@ export function InventoryPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredStock?.map((item: any) => (
+                {filteredStock && Array.isArray(filteredStock) && filteredStock.map((item: any) => (
                   <tr key={`${item.product.id}-${item.warehouse.id}`}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {item.product.name}
@@ -306,7 +306,7 @@ export function InventoryPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Selecione um produto</option>
-                    {allProducts?.map((product: any) => (
+                    {allProducts && Array.isArray(allProducts) && allProducts.map((product: any) => (
                       <option key={product.id} value={product.id}>
                         {product.name} ({product.sku})
                       </option>

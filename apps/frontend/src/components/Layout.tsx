@@ -89,7 +89,7 @@ export function Layout({ children }: LayoutProps) {
             </button>
           </div>
           <nav className="flex-1 space-y-2 px-4 py-6">
-            {navigation.map((item) => {
+            {navigation && Array.isArray(navigation) && navigation.map((item) => {
               const isActive = location.pathname === item.href
               return (
                 <Link
@@ -135,7 +135,7 @@ export function Layout({ children }: LayoutProps) {
             </button>
           </div>
           <nav className="flex-1 space-y-2 px-4 py-6">
-            {navigation.map((item) => {
+            {navigation && Array.isArray(navigation) && navigation.map((item) => {
               const isActive = location.pathname === item.href
               return (
                 <Link

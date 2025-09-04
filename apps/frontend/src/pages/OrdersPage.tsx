@@ -166,7 +166,7 @@ export function OrdersPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {orders?.map((order: any) => (
+              {orders && Array.isArray(orders) && orders.map((order: any) => (
                 <tr key={order.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {order.number}

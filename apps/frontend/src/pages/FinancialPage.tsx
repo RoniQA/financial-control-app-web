@@ -61,7 +61,7 @@ export function FinancialPage() {
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="-mb-px flex space-x-8">
-          {tabs.map((tab) => {
+          {tabs && Array.isArray(tabs) && tabs.map((tab) => {
             const Icon = tab.icon
             return (
               <button
@@ -184,7 +184,7 @@ export function FinancialPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {notifications?.filter((n: any) => n.status === 'PENDING').map((notification: any) => (
+                  {notifications && Array.isArray(notifications) && notifications.filter((n: any) => n.status === 'PENDING').map((notification: any) => (
                     <div
                       key={notification.id}
                       className="border border-gray-200 rounded-lg p-4"
@@ -319,7 +319,7 @@ export function FinancialPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {payments?.map((payment: any) => (
+                  {payments && Array.isArray(payments) && payments.map((payment: any) => (
                     <tr key={payment.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {payment.description || 'N/A'}

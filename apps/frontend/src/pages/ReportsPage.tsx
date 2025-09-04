@@ -17,8 +17,8 @@ export function ReportsPage() {
 
     const csvContent = [
       headers.join(','),
-      ...data.map(row => 
-        headers.map(header => {
+      ...(data && Array.isArray(data) ? data.map(row => 
+        (headers && Array.isArray(headers) ? headers : []).map(header => {
           const value = row[header] || ''
           return `"${String(value).replace(/"/g, '""')}"`
         }).join(',')
@@ -40,7 +40,7 @@ export function ReportsPage() {
 
   const exportSalesReport = () => {
     const headers = ['Número', 'Cliente', 'Status', 'Total', 'Data']
-    const data = salesReport?.map((order: any) => ({
+    const data = (salesReport && Array.isArray(salesReport) ? salesReport : []).map((order: any) => ({
       'Número': order.number,
       'Cliente': order.partner?.name || 'N/A',
       'Status': order.status,
@@ -53,7 +53,7 @@ export function ReportsPage() {
 
   const exportInventoryReport = () => {
     const headers = ['Produto', 'Depósito', 'Quantidade', 'Localização']
-    const data = inventoryReport?.map((stock: any) => ({
+    const data = (inventoryReport && Array.isArray(inventoryReport) ? inventoryReport : []).map((stock: any) => ({
       'Produto': stock.product.name,
       'Depósito': stock.warehouse.name,
       'Quantidade': stock.quantity,
@@ -65,7 +65,7 @@ export function ReportsPage() {
 
   const exportFinancialReport = () => {
     const headers = ['Tipo', 'Método', 'Valor Total', 'Quantidade de Transações']
-    const data = financialReport?.map((item: any) => ({
+    const data = (financialReport && Array.isArray(financialReport) ? financialReport : []).map((item: any) => ({
       'Tipo': item.type === 'INBOUND' ? 'Entradas' : 'Saídas',
       'Método': item.method,
       'Valor Total': item._sum?.amount?.toFixed(2) || '0.00',
@@ -191,7 +191,7 @@ export function ReportsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {salesReport?.map((order: any) => (
+                {salesReport && Array.isArray(salesReport) && salesReport.map((order: any) => (
                   <tr key={order.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order.number}
@@ -256,7 +256,7 @@ export function ReportsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {inventoryReport?.map((stock: any) => (
+                {inventoryReport && Array.isArray(inventoryReport) && inventoryReport.map((stock: any) => (
                   <tr key={stock.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {stock.product.name}
@@ -294,7 +294,7 @@ export function ReportsPage() {
             </button>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {financialReport?.map((item: any) => (
+            {financialReport && Array.isArray(financialReport) && financialReport.map((item: any) => (
               <div key={`${item.type}-${item.method}`} className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center">
                   <BarChart3 className="h-5 w-5 text-blue-500 mr-2" />

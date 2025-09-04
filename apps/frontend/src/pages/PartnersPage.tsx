@@ -133,7 +133,7 @@ export function PartnersPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {partners?.map((partner: any) => (
+              {partners && Array.isArray(partners) && partners.map((partner: any) => (
                 <tr key={partner.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {partner.name}

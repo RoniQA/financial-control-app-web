@@ -76,7 +76,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
       
       // Load order items with proper structure
       const items = order.items || []
-      const formattedItems = items.map((item: any) => ({
+      const formattedItems = (items && Array.isArray(items) ? items : []).map((item: any) => ({
         productId: item.productId || '',
         quantity: item.quantity || 1,
         unitPrice: item.unitPrice || 0,
@@ -97,7 +97,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
   // Update prices when order type changes
   useEffect(() => {
     if (orderItems.length > 0 && products && orderType) {
-      const updatedItems = orderItems.map(item => {
+      const updatedItems = (orderItems && Array.isArray(orderItems) ? orderItems : []).map(item => {
         if (item.productId) {
           const selectedProduct = products.find((p: any) => p.id === item.productId)
           if (selectedProduct && selectedProduct.prices && selectedProduct.prices.length > 0) {
@@ -256,7 +256,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Selecione um cliente/fornecedor</option>
-                {partners?.map((partner: any) => (
+                {partners && Array.isArray(partners) && partners.map((partner: any) => (
                   <option key={partner.id} value={partner.id}>
                     {partner.name} ({partner.type === 'CUSTOMER' ? 'Cliente' : 
                                     partner.type === 'SUPPLIER' ? 'Fornecedor' : 'Ambos'})
@@ -331,7 +331,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
 
               {orderItems.length > 0 && (
                 <div className="space-y-3">
-                  {orderItems.map((item, index) => (
+                  {orderItems && Array.isArray(orderItems) && orderItems.map((item, index) => (
                     <div key={index} className="grid grid-cols-12 gap-3 p-4 border rounded-md bg-gray-50">
                       <div className="col-span-5">
                         <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -343,7 +343,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
                           className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           <option value="">Selecione um produto</option>
-                          {products?.map((product: any) => (
+                          {products && Array.isArray(products) && products.map((product: any) => (
                             <option key={product.id} value={product.id}>
                               {product.name} - {product.sku}
                             </option>
