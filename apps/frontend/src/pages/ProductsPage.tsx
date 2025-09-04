@@ -4,6 +4,7 @@ import { Plus, Search, Edit, Trash2, TrendingUp, TrendingDown } from 'lucide-rea
 import api from '../services/api'
 import { ProductFormModal } from '../components/ProductFormModal'
 import { toast } from 'react-hot-toast'
+import { useDefaultWarehouse } from '../hooks/useDefaultWarehouse'
 
 export function ProductsPage() {
   const [search, setSearch] = useState('')
@@ -17,6 +18,7 @@ export function ProductsPage() {
   const [movementQuantity, setMovementQuantity] = useState<number>(0)
   const [movementReason, setMovementReason] = useState<string>('')
   const queryClient = useQueryClient()
+  const { data: defaultWarehouse } = useDefaultWarehouse()
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', search],
@@ -74,7 +76,7 @@ export function ProductsPage() {
     try {
       await api.post('/inventory/stock-moves', {
         productId: stockMovementModal.product.id,
-        warehouseId: 'cmf1uv2n8000az0axienbav97', // Estoque Principal
+        warehouseId: defaultWarehouse?.id,
         type: stockMovementModal.type,
         quantity: movementQuantity,
         reason: movementReason || 'AJUSTE_MANUAL',

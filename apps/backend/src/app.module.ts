@@ -13,6 +13,7 @@ import { CompaniesModule } from './modules/companies/companies.module';
 // Business modules
 import { ProductsModule } from './modules/products/products.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
+import { WarehousesModule } from './modules/warehouses/warehouses.module';
 import { PartnersModule } from './modules/partners/partners.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
@@ -67,6 +68,7 @@ import { HealthModule } from './health/health.module';
     // Business modules
     ProductsModule,
     InventoryModule,
+    WarehousesModule,
     PartnersModule,
     OrdersModule,
     InvoicesModule,

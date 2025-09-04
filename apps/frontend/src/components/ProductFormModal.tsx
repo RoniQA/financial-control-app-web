@@ -5,6 +5,8 @@ import { z } from 'zod'
 import { X, Save } from 'lucide-react'
 import api from '../services/api'
 import { toast } from 'react-hot-toast'
+import { useAuthStore } from '../stores/authStore'
+import { useDefaultWarehouse } from '../hooks/useDefaultWarehouse'
 
 const productSchema = z.object({
   sku: z.string().min(1, 'SKU é obrigatório'),
@@ -40,6 +42,8 @@ interface ProductFormModalProps {
 
 export function ProductFormModal({ isOpen, onClose, onSuccess, product }: ProductFormModalProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { user } = useAuthStore()
+  const { data: defaultWarehouse } = useDefaultWarehouse()
 
   const {
     register,
@@ -136,7 +140,7 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
         weight: data.weight,
         dimensions: data.dimensions,
         isActive: data.isActive,
-        companyId: 'cmf1uv2gc0000z0axy1xdrony', // Nova Agro company ID
+        companyId: user?.companyId,
       }
 
       // Only include SKU for new products
@@ -161,10 +165,10 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
         const currentStock = product.stocks?.reduce((sum: number, stock: any) => sum + stock.quantity, 0) || 0
         const stockDifference = data.initialQuantity - currentStock
         
-        if (stockDifference !== 0) {
+        if (stockDifference !== 0 && defaultWarehouse) {
           await api.post('/inventory/stock-moves', {
             productId: product.id,
-            warehouseId: 'cmf1uv2n8000az0axienbav97', // Estoque Principal
+            warehouseId: defaultWarehouse.id,
             type: stockDifference > 0 ? 'IN' : 'OUT',
             quantity: Math.abs(stockDifference),
             reason: 'STOCK_ADJUSTMENT',
@@ -186,11 +190,11 @@ export function ProductFormModal({ isOpen, onClose, onSuccess, product }: Produc
         }
         
         // Create initial stock if quantity > 0
-        if (data.initialQuantity > 0) {
+        if (data.initialQuantity > 0 && defaultWarehouse) {
           console.log('Creating initial stock for product:', response.data.id, 'quantity:', data.initialQuantity)
           const stockMoveResponse = await api.post('/inventory/stock-moves', {
             productId: response.data.id,
-            warehouseId: 'cmf1uv2n8000az0axienbav97', // Estoque Principal
+            warehouseId: defaultWarehouse.id,
             type: 'IN',
             quantity: data.initialQuantity,
             reason: 'INITIAL_STOCK',
