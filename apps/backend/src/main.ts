@@ -3,9 +3,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const logger = new Logger('Bootstrap');
 
   // Global prefix
@@ -36,6 +38,25 @@ async function bootstrap() {
   
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
+
+  // Serve static files from frontend build
+  const frontendPath = join(__dirname, '..', '..', '..', 'apps', 'frontend', 'dist');
+  app.useStaticAssets(frontendPath);
+  
+  // Serve frontend for all non-API routes
+  app.use('*', (req, res) => {
+    // If it's an API route, let it pass through
+    if (req.originalUrl.startsWith('/api')) {
+      return res.status(404).json({
+        message: 'API endpoint not found',
+        error: 'Not Found',
+        statusCode: 404
+      });
+    }
+    
+    // Serve index.html for all other routes (SPA routing)
+    res.sendFile(join(frontendPath, 'index.html'));
+  });
 
   // Simple health check endpoint
   app.use('/health', (req, res) => {
