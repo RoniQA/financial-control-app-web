@@ -133,7 +133,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
   }
 
   const removeItem = (index: number) => {
-    setOrderItems(orderItems.filter((_, i) => i !== index))
+    setOrderItems((orderItems && Array.isArray(orderItems) ? orderItems : []).filter((_, i) => i !== index))
   }
 
   const updateItem = (index: number, field: string, value: any) => {
@@ -176,7 +176,7 @@ export function OrderFormModal({ isOpen, onClose, onSuccess, order }: OrderFormM
 
       const total = calculateTotal()
 
-      const filteredItems = orderItems.filter(item => item.productId && item.quantity > 0)
+      const filteredItems = (orderItems && Array.isArray(orderItems) ? orderItems : []).filter(item => item.productId && item.quantity > 0)
       
       const orderData = {
         number: orderNumber,

@@ -31,7 +31,7 @@ export function InventoryPage() {
   })
 
   // Filter stock data based on selected filter
-  const filteredStock = stockSummary?.filter((item: any) => {
+  const filteredStock = (stockSummary && Array.isArray(stockSummary) ? stockSummary : []).filter((item: any) => {
     switch (filter) {
       case 'low-stock':
         return item.quantity <= 5
@@ -105,7 +105,7 @@ export function InventoryPage() {
                     Produtos em Estoque
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
-                    {stockSummary?.filter((item: any) => item.quantity > 0).length || 0}
+                    {stockSummary && Array.isArray(stockSummary) ? stockSummary.filter((item: any) => item.quantity > 0).length : 0}
                   </dd>
                 </dl>
               </div>
@@ -155,7 +155,7 @@ export function InventoryPage() {
                     Produtos com Estoque Baixo
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
-                    {stockSummary?.filter((item: any) => item.quantity <= 5).length || 0}
+                    {stockSummary && Array.isArray(stockSummary) ? stockSummary.filter((item: any) => item.quantity <= 5).length : 0}
                   </dd>
                 </dl>
               </div>
