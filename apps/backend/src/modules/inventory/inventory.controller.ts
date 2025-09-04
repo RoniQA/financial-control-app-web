@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 import { InventoryService } from './inventory.service';
@@ -32,9 +32,8 @@ export class InventoryController {
   @Get('summary')
   @ApiOperation({ summary: 'Resumo do estoque' })
   @ApiResponse({ status: 200, description: 'Resumo do estoque' })
-  async getStockSummary() {
-    // TODO: Get companyId from JWT token
-    const companyId = 'cmf1uv2gc0000z0axy1xdrony';
+  async getStockSummary(@Request() req: any) {
+    const companyId = req.user.companyId;
     return this.inventoryService.getStockSummary(companyId);
   }
 }

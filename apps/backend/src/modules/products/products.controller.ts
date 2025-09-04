@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 import { ProductsService } from './products.service';
@@ -16,16 +16,17 @@ export class ProductsController {
   @Post()
   @ApiOperation({ summary: 'Criar novo produto' })
   @ApiResponse({ status: 201, description: 'Produto criado com sucesso' })
-  async create(@Body() createProductDto: CreateProductDto) {
+  async create(@Body() createProductDto: CreateProductDto, @Request() req: any) {
+    // Override companyId with the one from JWT token
+    createProductDto.companyId = req.user.companyId;
     return this.productsService.create(createProductDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar produtos' })
   @ApiResponse({ status: 200, description: 'Lista de produtos' })
-  async findAll(@Query() filters: any) {
-    // TODO: Get companyId from JWT token
-    const companyId = 'cmf1uv2gc0000z0axy1xdrony'; // Nova Agro company ID
+  async findAll(@Query() filters: any, @Request() req: any) {
+    const companyId = req.user.companyId;
     return this.productsService.findAll(companyId, filters);
   }
 

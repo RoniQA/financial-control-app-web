@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 import { PartnersService } from './partners.service';
@@ -16,16 +16,17 @@ export class PartnersController {
   @Post()
   @ApiOperation({ summary: 'Criar novo parceiro' })
   @ApiResponse({ status: 201, description: 'Parceiro criado com sucesso' })
-  async create(@Body() createPartnerDto: CreatePartnerDto) {
+  async create(@Body() createPartnerDto: CreatePartnerDto, @Request() req: any) {
+    // Override companyId with the one from JWT token
+    createPartnerDto.companyId = req.user.companyId;
     return this.partnersService.create(createPartnerDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar parceiros' })
   @ApiResponse({ status: 200, description: 'Lista de parceiros' })
-  async findAll(@Query() filters: any) {
-    // TODO: Get companyId from JWT token
-    const companyId = 'cmf1uv2gc0000z0axy1xdrony'; // Nova Agro company ID
+  async findAll(@Query() filters: any, @Request() req: any) {
+    const companyId = req.user.companyId;
     return this.partnersService.findAll(companyId, filters);
   }
 
