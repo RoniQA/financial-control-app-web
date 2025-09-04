@@ -41,9 +41,9 @@ export function ProductsPage() {
         console.log('📦 Products response isArray:', Array.isArray(response.data))
         console.log('📦 Products response length:', response.data?.length)
         return response.data
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching products:', error)
-        console.error('Error response:', error.response?.data)
+        console.error('Error response:', error?.response?.data)
         throw error
       }
     },
