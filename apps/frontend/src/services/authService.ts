@@ -27,21 +27,58 @@ export interface RegisterRequest {
 
 export const authService = {
   login: async (data: LoginRequest): Promise<LoginResponse> => {
-    console.log('🔐 Calling login API with:', { email: data.email });
-    const response = await api.post('/auth/login', data);
-    console.log('🔐 Login API response:', {
-      status: response.status,
-      hasData: !!response.data,
-      hasUser: !!response.data?.user,
-      hasToken: !!response.data?.accessToken
-    });
-    
-    // Validar a resposta
-    if (!response.data?.user || !response.data?.accessToken) {
-      throw new Error('Resposta da API incompleta');
+    try {
+      console.log('🔐 Calling login API with:', { email: data.email });
+      
+      // Primeiro, testar a conectividade
+      const testResponse = await api.get('/auth/test');
+      console.log('🔗 API Test response:', testResponse.data);
+      
+      // Tentar fazer login
+      const response = await api.post('/auth/login', data);
+      
+      console.log('🔐 Login API raw response:', response);
+      console.log('🔐 Login API response data:', response.data);
+      console.log('🔐 Login response details:', {
+        status: response.status,
+        hasData: !!response.data,
+        hasUser: !!response.data?.user,
+        hasToken: !!response.data?.accessToken,
+        responseType: typeof response.data,
+        userDetails: response.data?.user ? {
+          id: response.data.user.id,
+          email: response.data.user.email,
+          companyId: response.data.user.companyId
+        } : null
+      });
+      
+      // Validar a resposta detalhadamente
+      if (!response.data) {
+        throw new Error('Resposta vazia da API');
+      }
+      
+      if (!response.data.user) {
+        throw new Error('Resposta não contém dados do usuário');
+      }
+      
+      if (!response.data.accessToken) {
+        throw new Error('Resposta não contém token de acesso');
+      }
+      
+      if (!response.data.refreshToken) {
+        throw new Error('Resposta não contém refresh token');
+      }
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('🔥 Login error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        stack: error.stack
+      });
+      throw error;
     }
-    
-    return response.data;
   },
 
   register: async (data: RegisterRequest) => {

@@ -11,12 +11,48 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Get('test')
+  @ApiOperation({ summary: 'Teste de conectividade' })
+  async test() {
+    console.log('🔍 Auth test endpoint called');
+    return {
+      message: 'Auth service is working',
+      timestamp: new Date().toISOString()
+    };
+  }
+
   @Post('login')
   @ApiOperation({ summary: 'Login do usuário' })
   @ApiResponse({ status: 200, description: 'Login realizado com sucesso' })
   @ApiResponse({ status: 401, description: 'Credenciais inválidas' })
   async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+    console.log('📥 Login request received:', { email: loginDto.email });
+    
+    try {
+      const result = await this.authService.login(loginDto);
+      
+      console.log('📤 Login response:', {
+        hasUser: !!result.user,
+        hasAccessToken: !!result.accessToken,
+        hasRefreshToken: !!result.refreshToken,
+        userDetails: result.user ? {
+          id: result.user.id,
+          email: result.user.email,
+          companyId: result.user.companyId
+        } : null
+      });
+
+      // Validar a resposta antes de enviar
+      if (!result.user || !result.accessToken || !result.refreshToken) {
+        console.error('❌ Invalid login response:', result);
+        throw new Error('Invalid login response structure');
+      }
+
+      return result;
+    } catch (error) {
+      console.error('❌ Login error:', error);
+      throw error;
+    }
   }
 
   @Post('register')
