@@ -11,90 +11,67 @@ interface User {
 
 interface AuthState {
   user: User | null
-  accessToken: string | null
-  refreshToken: string | null
   isAuthenticated: boolean
-  login: (user: User, accessToken: string, refreshToken: string) => void
+  login: (user: User) => void
   logout: () => void
-  updateTokens: (accessToken: string, refreshToken: string) => void
+  initializeDefault: () => void
 }
 
-const storageKey = 'auth-storage-v1';
+const DEFAULT_USER: User = {
+  id: 'user_local_admin',
+  email: 'admin@gestus.local',
+  firstName: 'Admin',
+  lastName: 'Local',
+  companyId: 'company_local',
+}
+
+const storageKey = 'auth-storage-v1'
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      accessToken: null,
-      refreshToken: null,
       isAuthenticated: false,
-      login: (user, accessToken, refreshToken) => {
-        console.log('🔐 Login called with:', { 
-          userId: user?.id,
-          userEmail: user?.email,
-          companyId: user?.companyId,
-          hasAccessToken: !!accessToken,
-          hasRefreshToken: !!refreshToken 
-        });
-
+      login: (user) => {
         const state = {
           user,
-          accessToken,
-          refreshToken,
           isAuthenticated: true,
-        };
-
-        // Salvar explicitamente no localStorage também
+        }
         localStorage.setItem(storageKey, JSON.stringify({
           state,
           version: 0
-        }));
-
-        set(state);
+        }))
+        set(state)
       },
       logout: () => {
-        console.log('🔓 Logout called');
-        localStorage.removeItem(storageKey);
+        localStorage.removeItem(storageKey)
         set({
           user: null,
-          accessToken: null,
-          refreshToken: null,
           isAuthenticated: false,
-        });
+        })
       },
-      updateTokens: (accessToken, refreshToken) => {
-        console.log('🔄 Updating tokens');
-        const currentState = useAuthStore.getState();
-        const newState = { 
-          ...currentState, 
-          accessToken, 
-          refreshToken 
-        };
-        
-        // Atualizar localStorage
-        localStorage.setItem(storageKey, JSON.stringify({
-          state: newState,
-          version: 0
-        }));
-        
-        set(newState);
+      initializeDefault: () => {
+        const savedAuth = localStorage.getItem(storageKey)
+        if (savedAuth) {
+          try {
+            const { state } = JSON.parse(savedAuth)
+            set(state)
+            return
+          } catch (error) {
+            // Ignore parse errors
+          }
+        }
+        // Fall back to default user
+        set({
+          user: DEFAULT_USER,
+          isAuthenticated: true,
+        })
       },
     }),
     {
       name: storageKey,
-      skipHydration: true, // Vamos gerenciar a hidratação manualmente
+      skipHydration: true,
     }
   )
-);
-
-// Hidratar o estado inicial do localStorage
-const savedAuth = localStorage.getItem(storageKey);
-if (savedAuth) {
-  try {
-    const { state } = JSON.parse(savedAuth);
-    useAuthStore.setState(state);
-  } catch (error) {
-    console.error('Failed to hydrate auth state:', error);
-  }
-}
+)
 

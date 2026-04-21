@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useAuthStore } from '../stores/authStore'
 import { Plus, Search, Edit, Trash2, TrendingUp, TrendingDown, RefreshCw } from 'lucide-react'
 import api from '../services/api'
 import { ProductFormModal } from '../components/ProductFormModal'
@@ -24,40 +23,17 @@ export function ProductsPage() {
   const { data: products, isLoading, error, refetch } = useQuery({
     queryKey: ['products', search],
     queryFn: async () => {
-      console.log('🔍 Fetching products with search:', search)
-      const authState = useAuthStore.getState()
-      console.log('🔑 Auth State during fetch:', {
-        isAuthenticated: authState.isAuthenticated,
-        hasToken: !!authState.accessToken,
-        companyId: authState.user?.companyId
+      const response = await api.get('/products', {
+        params: { search }
       })
-      
-      try {
-        const response = await api.get('/products', {
-          params: { search }
-        })
-        console.log('📦 Products response:', response.data)
-        console.log('📦 Products response type:', typeof response.data)
-        console.log('📦 Products response isArray:', Array.isArray(response.data))
-        console.log('📦 Products response length:', response.data?.length)
-        return response.data
-      } catch (error: any) {
-        console.error('Error fetching products:', error)
-        console.error('Error response:', error?.response?.data)
-        throw error
-      }
+      return response.data
     },
-    staleTime: 0, // Sempre considerar dados como stale
-    gcTime: 0, // Não manter cache
-    refetchOnWindowFocus: true, // Refetch when window gains focus
-    refetchOnMount: true, // Always refetch on mount
-    retry: 3, // Retry failed requests
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    retry: 3,
   })
-
-  console.log('📊 Products state:', { products, isLoading, error })
-  console.log('📊 Products data type:', typeof products)
-  console.log('📊 Products isArray:', Array.isArray(products))
-  console.log('📊 Products length:', products?.length)
 
   const handleCreateProduct = () => {
     setEditingProduct(null)
@@ -75,29 +51,24 @@ export function ProductsPage() {
   }
 
   const handleSuccess = () => {
-    console.log('🔄 Invalidating queries after product creation/update...')
-    console.log('Current products before invalidation:', products)
-    
     // Clear all caches related to products
     queryClient.removeQueries({ queryKey: ['products'] })
     queryClient.invalidateQueries({ queryKey: ['products'] })
     queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
     queryClient.invalidateQueries({ queryKey: ['default-warehouse'] })
     queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
-    
+
     // Force immediate refetch
     refetch()
-    
+
     // Force refetch with a small delay to ensure backend has processed the data
     setTimeout(() => {
       queryClient.refetchQueries({ queryKey: ['products'] })
-      console.log('✅ Queries invalidated and refetched after delay')
     }, 500)
-    
+
     // Additional refetch after a longer delay as backup
     setTimeout(() => {
       queryClient.refetchQueries({ queryKey: ['products'] })
-      console.log('✅ Backup refetch completed')
     }, 2000)
   }
 
@@ -154,50 +125,6 @@ export function ProductsPage() {
     setMovementReason('')
   }
 
-  const handleDebugTest = async () => {
-    try {
-      console.log('🔍 Testing debug endpoint...')
-      const authState = useAuthStore.getState()
-      console.log('🔑 Full Auth State:', authState)
-      console.log('🔑 Auth Details:', {
-        isAuthenticated: authState.isAuthenticated,
-        userId: authState.user?.id,
-        userEmail: authState.user?.email,
-        companyId: authState.user?.companyId,
-        hasAccessToken: !!authState.accessToken,
-        hasRefreshToken: !!authState.refreshToken
-      })
-      
-      // Verificar cabeçalhos da requisição
-      const headers = api.defaults.headers;
-      console.log('🔍 API Headers:', headers);
-      
-      const response = await api.get('/products/test/debug')
-      console.log('🔍 Debug response:', response.data)
-      console.log('🔍 Response headers:', response.headers)
-      
-      toast.success(`Debug: ${response.data.productsCount} produtos encontrados. CompanyId: ${response.data.companyId}`)
-    } catch (error: any) {
-      console.error('🔥 Debug test error:', error)
-      console.error('🔥 Error response:', error.response?.data)
-      console.error('🔥 Error status:', error.response?.status)
-      console.error('🔥 Error headers:', error.response?.headers)
-      toast.error(`Erro no teste de debug: ${error.response?.data?.message || error.message}`)
-    }
-  }
-
-  const handleSimpleTest = async () => {
-    try {
-      console.log('🔍 Testing simple endpoint...')
-      const response = await api.get('/products/test/simple')
-      console.log('🔍 Simple response:', response.data)
-      toast.success(`Simple test: ${response.data.message}`)
-    } catch (error: any) {
-      console.error('Simple test error:', error)
-      toast.error('Erro no teste simples')
-    }
-  }
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -214,15 +141,15 @@ export function ProductsPage() {
           <p className="text-gray-600">Gerencie seu catálogo de produtos</p>
         </div>
         <div className="flex space-x-2">
-          <button 
-            onClick={handleSimpleTest}
+          <button
+            onClick={() => refetch()}
             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center"
-            title="Testar conexão simples"
+            title="Atualizar lista de produtos"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             Atualizar
           </button>
-          <button 
+          <button
             onClick={handleCreateProduct}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
           >

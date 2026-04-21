@@ -18,27 +18,17 @@ export function OrdersPage() {
   const { data: orders, isLoading, refetch } = useQuery({
     queryKey: ['orders', search, statusFilter],
     queryFn: async () => {
-      console.log('🔍 Fetching orders with search:', search, 'status:', statusFilter)
       const response = await api.get('/orders', {
         params: { search, status: statusFilter }
       })
-      console.log('📦 Orders response:', response.data)
-      console.log('📦 Orders response type:', typeof response.data)
-      console.log('📦 Orders response isArray:', Array.isArray(response.data))
-      console.log('📦 Orders response length:', response.data?.length)
-      return response.data
+      return Array.isArray(response.data) ? response.data : []
     },
-    staleTime: 0, // Sempre considerar dados como stale
-    gcTime: 0, // Não manter cache
-    refetchOnWindowFocus: true, // Refetch when window gains focus
-    refetchOnMount: true, // Always refetch on mount
-    retry: 3, // Retry failed requests
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    retry: 3,
   })
-
-  console.log('📊 Orders state:', { orders, isLoading })
-  console.log('📊 Orders data type:', typeof orders)
-  console.log('📊 Orders isArray:', Array.isArray(orders))
-  console.log('📊 Orders length:', orders?.length)
 
   const handleCreateOrder = () => {
     setEditingOrder(null)
@@ -56,36 +46,28 @@ export function OrdersPage() {
   }
 
   const handleSuccess = () => {
-    console.log('🔄 Invalidating queries after order creation/update...')
-    console.log('Current orders before invalidation:', orders)
-    
     // Clear all caches related to orders
     queryClient.removeQueries({ queryKey: ['orders'] })
     queryClient.invalidateQueries({ queryKey: ['orders'] })
     queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
     queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
-    
+
     // Force immediate refetch
     refetch()
-    
+
     // Force refetch with a small delay to ensure backend has processed the data
     setTimeout(() => {
       queryClient.refetchQueries({ queryKey: ['orders'] })
-      console.log('✅ Queries invalidated and refetched after delay')
     }, 500)
-    
+
     // Additional refetch after a longer delay as backup
     setTimeout(() => {
       queryClient.refetchQueries({ queryKey: ['orders'] })
-      console.log('✅ Backup refetch completed')
     }, 2000)
   }
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      console.log('=== CHANGING ORDER STATUS ===')
-      console.log('Order ID:', orderId)
-      console.log('New Status:', newStatus)
       
       await api.patch(`/orders/${orderId}`, { 
         status: newStatus
@@ -95,7 +77,6 @@ export function OrdersPage() {
       queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
       queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
     } catch (error: any) {
-      console.error('Error changing status:', error)
       toast.error(error.response?.data?.message || 'Erro ao atualizar status')
     }
   }

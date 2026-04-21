@@ -194,13 +194,10 @@ const api = {
     const params = config?.params || {}
     const read = (name: string) => params[name] ?? query.get(name) ?? ''
 
-    if (pathname === '/auth/test') return ok({ message: 'local-auth-ok' })
     if (pathname === '/auth/profile') return ok({ message: 'Use dados da sessao local' })
     if (pathname === '/warehouses/default') return ok(db.warehouses.find((w) => w.isDefault) || db.warehouses[0])
     if (pathname === '/warehouses') return ok(db.warehouses)
 
-    if (pathname === '/products/test/simple') return ok({ message: 'API local funcionando' })
-    if (pathname === '/products/test/debug') return ok({ productsCount: db.products.length, companyId: 'company_local' })
     if (pathname === '/products') {
       const search = String(read('search')).toLowerCase().trim()
       const data = db.products
@@ -348,6 +345,7 @@ const api = {
     if (pathname === '/auth/login') {
       const user = db.users.find((u) => u.email.toLowerCase() === String(body?.email || '').toLowerCase())
       if (!user || user.password !== body?.password) createError(401, 'Email ou senha inválidos')
+      if (!user) throw new Error('User not found')
       return ok({
         accessToken: `local_access_${user.id}`,
         refreshToken: `local_refresh_${user.id}`,

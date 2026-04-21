@@ -30,47 +30,22 @@ export function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true)
     try {
-      console.log('🔐 Attempting login with:', { email: data.email });
-      const response = await authService.login(data);
-      
-      console.log('📦 Login response:', {
-        hasUser: !!response.user,
-        userId: response.user?.id,
-        userEmail: response.user?.email,
-        companyId: response.user?.companyId,
-        hasAccessToken: !!response.accessToken,
-        hasRefreshToken: !!response.refreshToken
-      });
+      const response = await authService.login(data)
 
       // Verificar se todos os dados necessários estão presentes
       if (!response.user || !response.accessToken || !response.refreshToken) {
-        throw new Error('Dados de autenticação incompletos');
+        throw new Error('Dados de autenticação incompletos')
       }
 
-      // Salvar no localStorage manualmente primeiro
-      localStorage.setItem('auth-storage-v1', JSON.stringify({
-        state: {
-          user: response.user,
-          accessToken: response.accessToken,
-          refreshToken: response.refreshToken,
-          isAuthenticated: true
-        },
-        version: 0
-      }));
+      // Atualizar o estado
+      login(response.user)
 
-      // Então atualizar o estado
-      login(response.user, response.accessToken, response.refreshToken);
-
-      console.log('🔐 Auth state after login:', useAuthStore.getState());
-
-      toast.success('Login realizado com sucesso!');
-      navigate('/dashboard');
+      toast.success('Login realizado com sucesso!')
+      navigate('/dashboard')
     } catch (error: any) {
-      console.error('🔥 Login error:', error);
-      console.error('🔥 Error response:', error.response?.data);
-      toast.error(error.response?.data?.message || error.message || 'Erro ao fazer login');
+      toast.error(error.response?.data?.message || error.message || 'Erro ao fazer login')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
   }
 

@@ -1,32 +1,38 @@
 import React from 'react'
-import { 
-  Package, 
-  Users, 
-  ShoppingCart, 
-  FileText, 
-  AlertTriangle, 
+import {
+  Package,
+  Users,
+  ShoppingCart,
+  FileText,
+  AlertTriangle,
   CheckCircle
 } from 'lucide-react'
 import api from '../services/api'
 import { SalesPurchaseCharts } from '../components/SalesPurchaseCharts'
 
-export function DashboardPage() {
-  console.log('DashboardPage rendering...')
+interface DashboardData {
+  totals: {
+    products: number
+    partners: number
+    orders: number
+    invoices: number
+  }
+  recentOrders: any[]
+  lowStockProducts: any[]
+}
 
+export function DashboardPage() {
   // Simplified version without complex queries
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
-  const [dashboardData, setDashboardData] = React.useState<any>(null)
+  const [dashboardData, setDashboardData] = React.useState<DashboardData | null>(null)
 
   React.useEffect(() => {
     const loadDashboard = async () => {
       try {
-        console.log('Loading dashboard data...')
         const response = await api.get('/reports/dashboard')
-        console.log('Dashboard data loaded:', response.data)
         setDashboardData(response.data)
       } catch (err: any) {
-        console.error('Error loading dashboard:', err)
         setError(err.message || 'Erro ao carregar dados')
       } finally {
         setIsLoading(false)
@@ -61,12 +67,12 @@ export function DashboardPage() {
     )
   }
 
-  const { totals, recentOrders, lowStockProducts } = dashboardData || {}
+  const { totals, recentOrders = [], lowStockProducts = [] } = dashboardData || {}
 
   // Calculate alerts
   const alerts = []
-  
-  if (lowStockProducts?.length > 0) {
+
+  if (lowStockProducts.length > 0) {
     alerts.push({
       type: 'warning',
       title: 'Estoque Baixo',
@@ -75,7 +81,7 @@ export function DashboardPage() {
     })
   }
 
-  if (recentOrders?.length === 0) {
+  if (recentOrders.length === 0) {
     alerts.push({
       type: 'info',
       title: 'Nenhum Pedido',
@@ -253,7 +259,7 @@ export function DashboardPage() {
             </div>
           </div>
           <div className="p-6">
-            {recentOrders?.length > 0 ? (
+            {recentOrders.length > 0 ? (
               <div className="space-y-4">
                 {recentOrders && Array.isArray(recentOrders) && recentOrders.map((order: any) => (
                   <div key={order.id} className="group flex items-center justify-between p-4 bg-gradient-to-r from-secondary-50 to-white rounded-xl border border-white/20 hover:shadow-medium transition-all duration-200 hover:scale-[1.02]">
@@ -300,7 +306,7 @@ export function DashboardPage() {
             </div>
           </div>
           <div className="p-6">
-            {lowStockProducts?.length > 0 ? (
+            {lowStockProducts.length > 0 ? (
               <div className="space-y-4">
                 {lowStockProducts && Array.isArray(lowStockProducts) && lowStockProducts.map((stock: any) => (
                   <div key={stock.id} className="group flex items-center justify-between p-4 bg-gradient-to-r from-warning-50 to-warning-100/30 rounded-xl border border-warning-200 hover:shadow-medium transition-all duration-200 hover:scale-[1.02]">

@@ -49,7 +49,6 @@ export function RegisterPage() {
       toast.success('Cadastro realizado com sucesso! Faça login para continuar.')
       navigate('/login')
     } catch (error: any) {
-      console.error('Erro no cadastro:', error)
       toast.error(error.message || 'Erro ao realizar cadastro')
     } finally {
       setIsLoading(false)
