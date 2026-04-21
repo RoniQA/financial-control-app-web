@@ -219,20 +219,6 @@ export function ProductsPage() {
             className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center"
             title="Testar conexão simples"
           >
-            Teste Simples
-          </button>
-          <button 
-            onClick={handleDebugTest}
-            className="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center"
-            title="Testar debug"
-          >
-            Debug
-          </button>
-          <button 
-            onClick={() => refetch()}
-            className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 flex items-center"
-            title="Atualizar lista"
-          >
             <RefreshCw className="h-4 w-4 mr-2" />
             Atualizar
           </button>
@@ -259,21 +245,6 @@ export function ProductsPage() {
           >
             Tentar novamente
           </button>
-        </div>
-      )}
-
-      {/* Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-yellow-800 mb-2">Debug Info</h3>
-          <div className="text-xs text-yellow-700 space-y-1">
-            <div>Products type: {typeof products}</div>
-            <div>Products isArray: {Array.isArray(products) ? 'true' : 'false'}</div>
-            <div>Products length: {products?.length || 0}</div>
-            <div>IsLoading: {isLoading ? 'true' : 'false'}</div>
-            <div>Error: {error ? 'true' : 'false'}</div>
-            {error && <div>Error message: {error.message}</div>}
-          </div>
         </div>
       )}
 

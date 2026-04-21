@@ -1,46 +1,23 @@
 {
   "name": "nova-agro",
   "version": "1.0.0",
-  "description": "Sistema Web Nova Agro - Financeiro + Estoque + NF",
+  "description": "Sistema web frontend-only com persistencia local",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/frontend"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "cd apps/backend && npm run dev",
-    "dev:frontend": "cd apps/frontend && npm run dev",
-    "start:dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "start:backend": "cd apps/backend && npm run dev",
+    "dev": "cd apps/frontend && npm run dev",
+    "start:dev": "cd apps/frontend && npm run dev",
+    "start": "cd apps/frontend && npm run dev",
     "start:frontend": "cd apps/frontend && npm run dev",
-    "build": "npm run build:backend && npm run build:frontend && node copy-frontend.js",
-    "build:backend": "cd apps/backend && npm run build",
+    "build": "cd apps/frontend && npm run build",
     "build:frontend": "cd apps/frontend && npm run build",
-    "start": "npm run start:backend",
-    "start:prod": "cd apps/backend && npm run start:prod",
     "preview": "cd apps/frontend && npm run preview",
-    "test": "npm run test:backend && npm run test:frontend",
-    "test:backend": "cd apps/backend && npm run test",
+    "test": "cd apps/frontend && npm run test",
     "test:frontend": "cd apps/frontend && npm run test",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:build": "docker-compose build",
-    "docker:prod": "docker-compose -f docker-compose.prod.yml up -d",
-    "db:migrate": "cd apps/backend && npm run prisma:migrate",
-    "db:deploy": "cd apps/backend && npm run prisma:deploy",
-    "db:seed": "cd apps/backend && npm run prisma:seed",
-    "db:studio": "cd apps/backend && npm run prisma:studio",
-    "setup:local": "node setup-local.js",
-    "setup:prod": "npm run db:deploy && npm run build",
-    "lint": "npm run lint:backend && npm run lint:frontend",
-    "lint:backend": "cd apps/backend && npm run lint",
+    "lint": "cd apps/frontend && npm run lint",
     "lint:frontend": "cd apps/frontend && npm run lint",
-    "format": "npm run format:backend && npm run format:frontend",
-    "format:backend": "cd apps/backend && npm run format",
     "format:frontend": "cd apps/frontend && npm run lint -- --fix"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2"
   }
 }
