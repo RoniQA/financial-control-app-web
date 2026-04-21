@@ -13,6 +13,7 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
+import { BackupComponent } from '../components/BackupComponent'
 import { useThemeStore } from '../stores/themeStore'
 
 export function SettingsPage() {
@@ -333,6 +334,11 @@ export function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Backup de Dados - Full Width */}
+      <Card variant="elevated" hover>
+        <BackupComponent />
+      </Card>
     </div>
   )
 }
