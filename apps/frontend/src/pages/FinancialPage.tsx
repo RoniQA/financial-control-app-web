@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { Plus, Search, TrendingUp, TrendingDown, DollarSign, AlertCircle, Check, X } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { Plus, Search, TrendingUp, TrendingDown, DollarSign, AlertCircle, Check, X, Trash2, Edit } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import api from '../services/api'
 
@@ -8,6 +8,9 @@ export function FinancialPage() {
   const [activeTab, setActiveTab] = useState('balance')
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingPayment, setEditingPayment] = useState<any>(null)
+  const queryClient = useQueryClient()
 
   const { data: payments, isLoading } = useQuery({
     queryKey: ['payments', search, typeFilter],
@@ -31,6 +34,48 @@ export function FinancialPage() {
     queryFn: () => api.get('/financial/notifications').then(res => res.data),
   })
 
+  const handleDeletePayment = async (payment: any) => {
+    if (window.confirm(`Deseja remover o pagamento "${payment.description}"?`)) {
+      try {
+        await api.delete(`/financial/payments/${payment.id}`)
+        toast.success('Pagamento removido com sucesso!')
+        queryClient.invalidateQueries({ queryKey: ['payments'] })
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || 'Erro ao remover pagamento')
+      }
+    }
+  }
+
+  const handleAddPayment = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const isPaid = formData.get('status') === 'paid'
+    const data = {
+      type: formData.get('type'),
+      method: formData.get('method'),
+      description: formData.get('description'),
+      amount: formData.get('amount'),
+      dueDate: formData.get('dueDate'),
+      paidAt: isPaid ? new Date().toISOString() : null,
+    }
+
+    try {
+      if (editingPayment) {
+        await api.put(`/financial/payments/${editingPayment.id}`, data)
+        toast.success('Pagamento atualizado com sucesso!')
+      } else {
+        await api.post('/financial/payments', data)
+        toast.success('Pagamento adicionado com sucesso!')
+      }
+      queryClient.invalidateQueries({ queryKey: ['payments'] })
+      setIsModalOpen(false)
+      setEditingPayment(null)
+      e.currentTarget.reset()
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Erro ao salvar pagamento')
+    }
+  }
+
   if (isLoading || notificationsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -52,7 +97,9 @@ export function FinancialPage() {
           <h1 className="text-2xl font-bold text-gray-900">Financeiro</h1>
           <p className="text-gray-600">Controle financeiro e fluxo de caixa</p>
         </div>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center">
           <Plus className="h-4 w-4 mr-2" />
           Novo Pagamento
         </button>
@@ -316,6 +363,9 @@ export function FinancialPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ações
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -351,6 +401,27 @@ export function FinancialPage() {
                           {payment.paidAt ? 'Pago' : 'Pendente'}
                         </span>
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => {
+                            setEditingPayment(payment)
+                            setIsModalOpen(true)
+                          }}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="Editar pagamento"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeletePayment(payment)}
+                          className="text-red-600 hover:text-red-900"
+                          title="Remover pagamento"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -365,6 +436,131 @@ export function FinancialPage() {
           )}
         </div>
       )}
+
+      {/* Modal de Novo/Editar Pagamento */}
+      <AddPaymentModal 
+        isOpen={isModalOpen} 
+        onClose={() => {
+          setIsModalOpen(false)
+          setEditingPayment(null)
+        }} 
+        onSubmit={handleAddPayment}
+        editingPayment={editingPayment}
+      />
+    </div>
+  )
+}
+
+// Modal para adicionar/editar novo pagamento
+function AddPaymentModal({ isOpen, onClose, onSubmit, editingPayment }: { isOpen: boolean; onClose: () => void; onSubmit: (e: React.FormEvent<HTMLFormElement>) => void; editingPayment?: any }) {
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">{editingPayment ? 'Editar Pagamento' : 'Novo Pagamento'}</h2>
+        </div>
+
+        <form onSubmit={onSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Tipo</label>
+            <select
+              name="type"
+              required
+              defaultValue={editingPayment?.type || ''}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Selecione um tipo</option>
+              <option value="INBOUND">Entrada</option>
+              <option value="OUTBOUND">Saída</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Método</label>
+            <select
+              name="method"
+              required
+              defaultValue={editingPayment?.method || ''}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Selecione um método</option>
+              <option value="PIX">PIX</option>
+              <option value="BOLETO">Boleto</option>
+              <option value="TRANSFERENCIA">Transferência</option>
+              <option value="DINHEIRO">Dinheiro</option>
+              <option value="CHEQUE">Cheque</option>
+              <option value="CARTAO_CREDITO">Cartão de Crédito</option>
+              <option value="CARTAO_DEBITO">Cartão de Débito</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Descrição</label>
+            <input
+              type="text"
+              name="description"
+              required
+              defaultValue={editingPayment?.description || ''}
+              placeholder="Ex: Pagamento de fornecedor"
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Valor (R$)</label>
+            <input
+              type="number"
+              name="amount"
+              required
+              step="0.01"
+              min="0"
+              defaultValue={editingPayment?.amount || ''}
+              placeholder="0,00"
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Data de Vencimento</label>
+            <input
+              type="date"
+              name="dueDate"
+              defaultValue={editingPayment?.dueDate ? new Date(editingPayment.dueDate).toISOString().split('T')[0] : ''}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Status</label>
+            <select
+              name="status"
+              defaultValue={editingPayment?.paidAt ? 'paid' : 'pending'}
+              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="pending">Pendente</option>
+              <option value="paid">Pago</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="submit"
+              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            >
+              {editingPayment ? 'Atualizar' : 'Adicionar'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

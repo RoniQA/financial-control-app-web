@@ -25,7 +25,6 @@ type LocalDb = {
   orders: any[]
   financialNotifications: any[]
   payments: any[]
-  fiscalNfe: any[]
   warehouses: any[]
 }
 
@@ -144,7 +143,6 @@ const seedDb = (): LocalDb => {
         createdAt: nowIso(),
       },
     ],
-    fiscalNfe: [],
     warehouses: [
       {
         id: warehouseId,
@@ -257,17 +255,6 @@ const api = {
       return ok({ totalInbound, totalOutbound, balance: totalInbound - totalOutbound })
     }
 
-    if (pathname === '/fiscal/nfe') {
-      const status = String(read('status')).trim()
-      const search = String(read('search')).toLowerCase().trim()
-      const data = db.fiscalNfe.filter((n) => {
-        if (status && n.status !== status) return false
-        if (!search) return true
-        return String(n.number).toLowerCase().includes(search)
-      })
-      return ok(data)
-    }
-
     if (pathname === '/reports/dashboard') {
       const inventorySummary = db.stocks.map((stock) => ({
         ...stock,
@@ -284,7 +271,6 @@ const api = {
           products: db.products.length,
           partners: db.partners.length,
           orders: db.orders.length,
-          invoices: db.fiscalNfe.length,
         },
         recentOrders,
         lowStockProducts,
@@ -488,6 +474,26 @@ const api = {
       return ok({ message: 'Notificação rejeitada' })
     }
 
+    if (pathname === '/financial/payments') {
+      const { type, method, description, amount, dueDate, paidAt } = body || {}
+      if (!type || !method || !description || !amount) {
+        createError(400, 'Tipo, método, descrição e valor são obrigatórios')
+      }
+      const item = {
+        id: randomId('payment'),
+        type,
+        method,
+        description,
+        amount: Number(amount),
+        dueDate: dueDate || nowIso(),
+        paidAt: paidAt || null,
+        createdAt: nowIso(),
+      }
+      db.payments.push(item)
+      saveDb(db)
+      return ok(item)
+    }
+
     return createError(404, `Endpoint local não implementado: ${pathname}`)
   },
 
@@ -515,7 +521,35 @@ const api = {
     if (pathname.startsWith('/orders/')) {
       const order = db.orders.find((o) => o.id === id)
       if (!order) createError(404, 'Pedido não encontrado')
+      
+      const oldStatus = order.status
+      const newStatus = body.status
+      const statusesForPayment = ['APPROVED', 'IN_SEPARATION', 'IN_DELIVERY', 'COMPLETED']
+      
+      // Atualizar pedido
       Object.assign(order, body, { updatedAt: nowIso() })
+      
+      // Criar pagamento automaticamente se status mudou para um dos status desejados
+      if (newStatus && statusesForPayment.includes(newStatus) && oldStatus !== newStatus) {
+        // Verificar se já existe um pagamento para este pedido
+        const paymentExists = db.payments.some((p) => p.description && p.description.includes(`Pedido ${order.number}`))
+        
+        if (!paymentExists) {
+          const paymentType = order.type === 'SALE' ? 'INBOUND' : 'OUTBOUND'
+          const payment = {
+            id: randomId('payment'),
+            type: paymentType,
+            method: 'PEDIDO',
+            description: `Pedido ${order.number} - ${order.type === 'SALE' ? 'Venda' : 'Compra'}`,
+            amount: Number(order.total || 0),
+            dueDate: nowIso(),
+            paidAt: null,
+            createdAt: nowIso(),
+          }
+          db.payments.push(payment)
+        }
+      }
+      
       saveDb(db)
       return ok(order)
     }
@@ -545,6 +579,41 @@ const api = {
       db.orders = db.orders.filter((o) => o.id !== id)
       saveDb(db)
       return ok({ message: 'Pedido removido' })
+    }
+
+    if (pathname.startsWith('/financial/payments/')) {
+      const paymentId = pathname.split('/')[3]
+      db.payments = db.payments.filter((p) => p.id !== paymentId)
+      saveDb(db)
+      return ok({ message: 'Pagamento removido' })
+    }
+
+    return createError(404, `Endpoint local não implementado: ${pathname}`)
+  },
+
+  async put(url: string, body?: any) {
+    const db = getDb()
+    const { pathname } = parseUrl(url)
+
+    if (pathname.startsWith('/financial/payments/')) {
+      const paymentId = pathname.split('/')[3]
+      const payment = db.payments.find((p) => p.id === paymentId)
+      if (!payment) createError(404, 'Pagamento não encontrado')
+      
+      const { type, method, description, amount, dueDate, paidAt } = body || {}
+      if (!type || !method || !description || !amount) {
+        createError(400, 'Tipo, método, descrição e valor são obrigatórios')
+      }
+      
+      payment.type = type
+      payment.method = method
+      payment.description = description
+      payment.amount = Number(amount)
+      payment.dueDate = dueDate || payment.dueDate
+      payment.paidAt = paidAt || null
+      
+      saveDb(db)
+      return ok(payment)
     }
 
     return createError(404, `Endpoint local não implementado: ${pathname}`)

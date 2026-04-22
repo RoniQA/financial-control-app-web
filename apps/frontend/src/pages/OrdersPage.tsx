@@ -74,6 +74,8 @@ export function OrdersPage() {
       })
       toast.success('Status atualizado com sucesso!')
       queryClient.invalidateQueries({ queryKey: ['orders'] })
+      queryClient.invalidateQueries({ queryKey: ['payments'] })
+      queryClient.invalidateQueries({ queryKey: ['company-balance'] })
       queryClient.invalidateQueries({ queryKey: ['reports-dashboard'] })
       queryClient.invalidateQueries({ queryKey: ['inventory-summary'] })
     } catch (error: any) {

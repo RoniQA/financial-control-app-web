@@ -7,7 +7,6 @@ import {
   Users, 
   ShoppingCart, 
   DollarSign, 
-  Receipt, 
   BarChart3,
   Menu,
   X,
@@ -30,7 +29,6 @@ const navigation = [
   { name: 'Parceiros', href: '/partners', icon: Users, color: 'warning' },
   { name: 'Pedidos', href: '/orders', icon: ShoppingCart, color: 'danger' },
   { name: 'Financeiro', href: '/financial', icon: DollarSign, color: 'success' },
-  { name: 'Fiscal', href: '/fiscal', icon: Receipt, color: 'secondary' },
   { name: 'Relatórios', href: '/reports', icon: BarChart3, color: 'accent' },
   { name: 'Configurações', href: '/settings', icon: Settings, color: 'secondary' },
 ]

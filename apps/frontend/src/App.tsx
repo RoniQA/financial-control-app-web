@@ -10,7 +10,6 @@ import { PartnersPage } from './pages/PartnersPage'
 import { OrdersPage } from './pages/OrdersPage'
 
 import { FinancialPage } from './pages/FinancialPage'
-import { FiscalPage } from './pages/FiscalPage'
 import { ReportsPage } from './pages/ReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
 
@@ -34,7 +33,6 @@ function App() {
         <Route path="/orders" element={<OrdersPage />} />
 
         <Route path="/financial" element={<FinancialPage />} />
-        <Route path="/fiscal" element={<FiscalPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
