@@ -39,7 +39,7 @@ export function FinancialPage() {
       try {
         await api.delete(`/financial/payments/${payment.id}`)
         toast.success('Pagamento removido com sucesso!')
-        queryClient.invalidateQueries({ queryKey: ['payments'] })
+        queryClient.invalidateQueries({ queryKey: ['payments'], exact: false })
       } catch (error: any) {
         toast.error(error.response?.data?.message || 'Erro ao remover pagamento')
       }
@@ -50,27 +50,45 @@ export function FinancialPage() {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const isPaid = formData.get('status') === 'paid'
+    const type = formData.get('type') as string
+    const method = formData.get('method') as string
+    const description = formData.get('description') as string
+    const amount = formData.get('amount') as string
+    const dueDate = formData.get('dueDate') as string
+    
     const data = {
-      type: formData.get('type'),
-      method: formData.get('method'),
-      description: formData.get('description'),
-      amount: formData.get('amount'),
-      dueDate: formData.get('dueDate'),
+      type,
+      method,
+      description,
+      amount,
+      dueDate,
       paidAt: isPaid ? new Date().toISOString() : null,
     }
 
     try {
       if (editingPayment) {
-        await api.put(`/financial/payments/${editingPayment.id}`, data)
+        const updated = await api.put(`/financial/payments/${editingPayment.id}`, data)
         toast.success('Pagamento atualizado com sucesso!')
+        // Atualizar cache otimisticamente
+        queryClient.setQueryData(['payments', search, typeFilter], (oldData: any) => {
+          return oldData.map((p: any) => p.id === editingPayment.id ? updated.data : p)
+        })
       } else {
-        await api.post('/financial/payments', data)
+        const created = await api.post('/financial/payments', data)
         toast.success('Pagamento adicionado com sucesso!')
+        // Atualizar cache otimisticamente
+        queryClient.setQueryData(['payments', search, typeFilter], (oldData: any) => {
+          return [...(oldData || []), created.data]
+        })
       }
-      queryClient.invalidateQueries({ queryKey: ['payments'] })
       setIsModalOpen(false)
       setEditingPayment(null)
       e.currentTarget.reset()
+      // Invalidar queries após um pequeno delay para sincronizar
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['payments'], exact: false })
+        queryClient.invalidateQueries({ queryKey: ['company-balance'] })
+      }, 100)
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Erro ao salvar pagamento')
     }

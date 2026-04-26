@@ -476,9 +476,7 @@ const api = {
 
     if (pathname === '/financial/payments') {
       const { type, method, description, amount, dueDate, paidAt } = body || {}
-      if (!type || !method || !description || !amount) {
-        createError(400, 'Tipo, método, descrição e valor são obrigatórios')
-      }
+      if (!type || !method || !description || !amount) createError(400, 'Tipo, método, descrição e valor são obrigatórios')
       const item = {
         id: randomId('payment'),
         type,
@@ -601,9 +599,7 @@ const api = {
       if (!payment) createError(404, 'Pagamento não encontrado')
       
       const { type, method, description, amount, dueDate, paidAt } = body || {}
-      if (!type || !method || !description || !amount) {
-        createError(400, 'Tipo, método, descrição e valor são obrigatórios')
-      }
+      if (!type || !method || !description || !amount) createError(400, 'Tipo, método, descrição e valor são obrigatórios')
       
       payment.type = type
       payment.method = method
